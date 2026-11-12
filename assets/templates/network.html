@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>关系网</title>
+<style>
+:root{--paper:#f4efe4;--card:#fffdf8;--ink:#27231e;--mute:#7b7266;--line:#cdc3b0;--rule:#e4dcca;--accent:#a8452a;
+  --serif:"Source Han Serif SC","Noto Serif CJK SC","Noto Serif SC","Songti SC","STSong","SimSun",serif;
+  --sans:-apple-system,"PingFang SC","Noto Sans CJK SC","Microsoft YaHei",sans-serif}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;background:var(--paper);color:var(--ink);font-family:var(--sans);overflow:hidden}
+#bar{position:fixed;top:0;left:0;right:0;z-index:8;padding:10px 20px 10px;display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center;background:linear-gradient(var(--paper) 70%,rgba(244,239,228,0))}
+#bar h1{font-family:var(--serif);font-size:19px;margin:0 6px 0 0;letter-spacing:.02em}
+#bar h1 small{font-family:var(--sans);font-size:11px;letter-spacing:.2em;color:var(--accent);margin-left:10px}
+.grp{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.grp>label{font-size:11px;letter-spacing:.12em;color:var(--mute);margin-right:2px}
+.chip{display:inline-flex;align-items:center;gap:6px;font-size:12px;padding:3px 11px;border:1px solid var(--line);background:rgba(255,253,248,.7);border-radius:999px;cursor:pointer;user-select:none;color:var(--ink)}
+.chip.off{opacity:.35}
+.chip.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+.sw{width:9px;height:9px;border-radius:50%}
+.ln{display:inline-block;width:18px;border-top:2px solid}
+input[type=text]{font:inherit;font-size:12.5px;padding:5px 12px;border:1px solid var(--line);background:rgba(255,253,248,.85);border-radius:999px;width:150px;outline:none}
+button{font:inherit;font-size:12px;padding:4px 12px;border:1px solid var(--line);background:rgba(255,253,248,.8);border-radius:999px;cursor:pointer;color:var(--ink)}
+button:hover{background:#ebe4d3}
+#svg{position:fixed;inset:0;width:100%;height:100%;cursor:grab}
+.nd{cursor:pointer;transition:opacity .15s}
+.nd circle{stroke:var(--paper);stroke-width:2}
+.nd text{font-family:var(--sans);font-size:11.5px;text-anchor:middle;paint-order:stroke;stroke:var(--paper);stroke-width:4px;stroke-linejoin:round;pointer-events:none;fill:#3a342c}
+.elab{font-family:var(--serif);font-size:11.5px;text-anchor:middle;paint-order:stroke;stroke:var(--paper);stroke-width:4px;pointer-events:none}
+/* 面板 */
+.panel{position:fixed;top:0;bottom:0;background:var(--card);z-index:10;overflow-y:auto;transition:transform .22s}
+#left{left:0;width:330px;border-right:1px solid var(--rule);box-shadow:18px 0 40px -30px rgba(60,40,10,.45);transform:translateX(-102%)}
+#right{right:0;width:370px;border-left:1px solid var(--rule);box-shadow:-18px 0 40px -30px rgba(60,40,10,.45);transform:translateX(102%)}
+#left.show,#right.show{transform:none}
+.panel .in{padding:78px 24px 60px}
+.panel h2{font-family:var(--serif);font-size:21px;line-height:1.4;margin:4px 0 8px}
+.panel h3{font-size:11.5px;letter-spacing:.14em;color:var(--mute);font-weight:600;margin:22px 0 8px;padding-top:14px;border-top:1px solid var(--rule)}
+.panel .lead{font-family:var(--serif);font-size:15.5px;line-height:1.85;margin:0 0 14px}
+.tag{font-size:10.5px;padding:1px 8px;border-radius:999px;color:#fff;letter-spacing:.05em;display:inline-block}
+.tag.o{background:transparent;color:var(--mute);border:1px solid var(--line)}
+.meta{display:flex;gap:6px;flex-wrap:wrap;align-items:center;font-size:12px;color:var(--mute)}
+.rel{display:block;padding:8px 8px;margin:0 -8px;border-radius:8px;cursor:pointer;font-size:13px;line-height:1.55}
+.rel:hover{background:#f3ecdc}
+.rel .rt{font-size:11.5px;margin-right:6px}
+.rel b{font-family:var(--serif);font-weight:700}
+.rel i{font-style:normal;color:var(--mute);font-size:11.5px}
+.rel .snip{display:block;font-family:var(--serif);font-size:12.5px;color:#6a6256;margin-top:2px}
+.item{display:block;padding:7px 8px;margin:0 -8px;border-radius:8px;cursor:pointer;font-size:13px;line-height:1.55}
+.item:hover{background:#f3ecdc}
+.item .k{font-family:var(--serif);font-weight:700}
+.kv{display:flex;gap:14px;flex-wrap:wrap;font-size:12.5px;color:var(--mute);margin:6px 0 4px}
+.kv b{font-family:var(--serif);font-size:20px;color:var(--ink);display:block}
+.path{border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin:12px 0;background:#faf6ea;font-size:13px;line-height:1.7}
+.pbtn{display:inline-block;margin:4px 6px 0 0}
+#x,#xl{position:absolute;top:60px;right:16px;border:0;background:none;font-size:22px;color:var(--mute);cursor:pointer;padding:0}
+#legend{position:fixed;left:20px;bottom:14px;z-index:5;font-size:12px;color:var(--mute);background:rgba(255,253,248,.88);border:1px solid var(--rule);border-radius:10px;padding:8px 12px;line-height:1.8}
+#legend .ln{width:20px;margin-right:6px;vertical-align:middle}
+@media(max-width:900px){#right,#left{width:100%}}
+</style>
+</head>
+<body>
+<div id="bar">
+  <h1 id="ttl"></h1>
+  <div class="grp"><button id="bd">发现</button><button id="bf">适应窗口</button></div>
+  <div class="grp"><label>着色</label><span class="chip on" data-m="type">命题类型</span><span class="chip" data-m="comm">社群</span><span class="chip" data-m="part">篇章</span></div>
+  <div class="grp" id="filt"></div>
+  <div class="grp" id="rels"></div>
+  <input type="text" id="q" placeholder="搜索命题,回车定位">
+</div>
+<svg id="svg"><defs id="defs"></defs><g id="vp"><g id="gE"></g><g id="gL"></g><g id="gN"></g></g></svg>
+<aside class="panel" id="left"><button id="xl">×</button><div class="in" id="lin"></div></aside>
+<aside class="panel" id="right"><button id="x">×</button><div class="in" id="rin"></div></aside>
+<div id="legend"></div>
+
+<script>
+const PK=/*DATA*/null/*END*/;const D=PK.D,A=PK.A;
+const NS='http://www.w3.org/2000/svg';
+const TYC={V:'#a8452a',M:'#3c5a6b',F:'#5f7a4f',E:'#a9762b'};
+const RELC={cause:'#a8452a',support:'#3c5a6b',solve:'#5f7a4f',require:'#7b5a82',oppose:'#8a8378',refine:'#b3a995'};
+const REL=D.relTypes;
+const BS={e:'书中明确',x:'案例 / 个人经历',i:'推断'};
+const PART={};D.outline.forEach(p=>p.chapters.forEach(c=>PART[c.k]=p));
+const COMMC=['#a8452a','#3c5a6b','#5f7a4f','#a9762b','#7b5a82','#2f7d7a','#9a5b6b','#6b6f3a','#8a7f6d'];
+document.title=D.title+' · 关系网';document.getElementById('ttl').innerHTML=D.title+'<small>关系网 · NETWORK</small>';
+const svg=document.getElementById('svg'),vp=document.getElementById('vp'),gN=document.getElementById('gN'),gE=document.getElementById('gE'),gL=document.getElementById('gL'),defs=document.getElementById('defs');
+const mk=(t,a,p)=>{const e=document.createElementNS(NS,t);for(const k in a)e.setAttribute(k,a[k]);p&&p.appendChild(e);return e};
+const esc=s=>s.replace(/[&<>]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[m]));
+
+// 数据
+const nodes=D.claims.map(c=>({...c,kind:'c'}));
+const nm=Object.fromEntries(nodes.map(n=>[n.id,n]));
+const edges=D.links.map(l=>({s:nm[l.s],t:nm[l.t],ty:l.ty,basis:l.basis,note:l.note}));
+nodes.forEach(n=>{n.deg=A.degree[n.id];n.r=5+Math.sqrt(n.deg)*2.6;n.comm=A.comm[n.id];n.part=PART[n.ch]});
+for(const k in REL){const m=mk('marker',{id:'m-'+k,viewBox:'0 0 10 10',refX:9,refY:5,markerWidth:6.5,markerHeight:6.5,orient:'auto'},defs);mk('path',{d:'M0,1.2 L10,5 L0,8.8 z',fill:RELC[k]},m)}
+edges.forEach(e=>{
+  e.el=mk('path',{fill:'none',stroke:RELC[e.ty],'stroke-width':e.ty==='refine'?1.1:1.6,'marker-end':'url(#m-'+e.ty+')'},gE);
+  e.el.setAttribute('stroke-dasharray',e.ty==='oppose'?'6 4':(e.basis==='i'?'2 3':''));
+  e.lab=mk('text',{class:'elab',fill:RELC[e.ty]},gL);e.lab.textContent=REL[e.ty];e.lab.style.display='none';
+});
+nodes.forEach(n=>{
+  n.el=mk('g',{class:'nd'},gN);n.ci=mk('circle',{r:n.r},n.el);
+  n.tx=mk('text',{y:n.r+13},n.el);n.tx.textContent=n.h;
+  n.el.addEventListener('pointerdown',ev=>{ev.stopPropagation();dragging=n;moved=false;n.fx=n.sx;n.fy=n.sy;alpha=Math.max(alpha,.3)});
+  n.el.addEventListener('pointerenter',()=>{hov=n;refresh()});
+  n.el.addEventListener('pointerleave',()=>{hov=null;refresh()});
+});
+
+// 状态
+let colorMode='type',sel=null,hov=null,query='',hl=null,pathA=null,pathB=null,pathSet=null;
+const hiddenK=new Set(),hiddenR=new Set();
+const key=n=>colorMode==='type'?n.ty:colorMode==='comm'?'c'+n.comm:n.part.id;
+const col=n=>colorMode==='type'?TYC[n.ty]:colorMode==='comm'?COMMC[n.comm%COMMC.length]:n.part.color;
+const nvis=n=>!hiddenK.has(key(n));
+const evis=e=>nvis(e.s)&&nvis(e.t)&&!hiddenR.has(e.ty);
+
+// 力模拟
+const cIdx=A.comms.length;
+nodes.forEach(n=>{const a=n.comm/cIdx*6.283+Math.random()*.5,r=160+Math.random()*180;n.sx=Math.cos(a)*r;n.sy=Math.sin(a)*r;n.vx=n.vy=0;n.x=n.sx;n.y=n.sy});
+let alpha=1,dragging=null,moved=false;
+function tick(){
+  if(alpha<.008&&!dragging)return;
+  const vn=nodes.filter(nvis);
+  for(let i=0;i<vn.length;i++){const a=vn[i];
+    for(let j=i+1;j<vn.length;j++){const b=vn[j];let dx=b.sx-a.sx,dy=b.sy-a.sy,d2=dx*dx+dy*dy+.01,d=Math.sqrt(d2);
+      const f=(2600/d2)*alpha;dx/=d;dy/=d;a.vx-=dx*f;a.vy-=dy*f;b.vx+=dx*f;b.vy+=dy*f;
+      const mr=a.r+b.r+16;if(d<mr){const p=(mr-d)*.05;a.vx-=dx*p;a.vy-=dy*p;b.vx+=dx*p;b.vy+=dy*p}}}
+  edges.forEach(e=>{if(!evis(e))return;const a=e.s,b=e.t;let dx=b.sx-a.sx,dy=b.sy-a.sy,d=Math.sqrt(dx*dx+dy*dy)+.01;
+    const L=52+(a.r+b.r),f=(d-L)*.07*alpha;dx/=d;dy/=d;a.vx+=dx*f;a.vy+=dy*f;b.vx-=dx*f;b.vy-=dy*f});
+  vn.forEach(n=>{n.vx-=n.sx*.03*alpha;n.vy-=n.sy*.03*alpha;
+    if(n.fx!=null){n.sx=n.fx;n.sy=n.fy;n.vx=n.vy=0}else{n.vx*=.78;n.vy*=.78;n.sx+=n.vx;n.sy+=n.vy}});
+  alpha*=.992;
+}
+for(let i=0;i<500;i++)tick();
+function draw(){
+  nodes.forEach(n=>{n.x+=(n.sx-n.x)*.35;n.y+=(n.sy-n.y)*.35;n.el.setAttribute('transform',`translate(${n.x},${n.y})`)});
+  edges.forEach(e=>{
+    if(e.el.style.display==='none')return;
+    const a=e.s,b=e.t;let dx=b.x-a.x,dy=b.y-a.y,d=Math.sqrt(dx*dx+dy*dy)+.01;dx/=d;dy/=d;
+    const x1=a.x+dx*(a.r+1),y1=a.y+dy*(a.r+1),x2=b.x-dx*(b.r+3),y2=b.y-dy*(b.r+3);
+    e.el.setAttribute('d',`M${x1},${y1} L${x2},${y2}`);
+    e.lab.setAttribute('x',(a.x+b.x)/2);e.lab.setAttribute('y',(a.y+b.y)/2-4);
+  });
+}
+let fr=0;
+function cullLabels(){
+  const vn=nodes.filter(nvis).sort((a,b)=>(b.forceLab?1e3:0)+b.deg-((a.forceLab?1e3:0)+a.deg));
+  const boxes=[];
+  vn.forEach(n=>{
+    const w=(n.h.length*11.5+8)*1,h=15,cx=n.x*sc+tx,cy=(n.y+n.r+13)*sc+ty;
+    const b=[cx-w*sc/2,cy-h*sc*.75,cx+w*sc/2,cy+h*sc*.35];
+    const ok=n.forceLab||!boxes.some(o=>b[0]<o[2]&&b[2]>o[0]&&b[1]<o[3]&&b[3]>o[1]);
+    n.tx.style.display=ok?'':'none';if(ok)boxes.push(b);
+  });
+}
+function loop(){tick();draw();if(++fr%12===0)cullLabels();requestAnimationFrame(loop)}
+
+// 刷新
+function focusSet(){
+  if(pathSet)return{set:pathSet,edges:true,path:true};
+  if(hl)return{set:hl};
+  const f=hov||sel;if(!f)return null;
+  const s=new Set([f.id]);edges.forEach(e=>{if(!evis(e))return;if(e.s===f)s.add(e.t.id);if(e.t===f)s.add(e.s.id)});
+  return{set:s,f};
+}
+function refresh(){
+  const fi=focusSet(),q=query.trim().toLowerCase();
+  nodes.forEach(n=>{
+    const v=nvis(n);n.el.style.display=v?'':'none';if(!v)return;
+    n.ci.setAttribute('fill',col(n));
+    let o=1;if(fi)o=fi.set.has(n.id)?1:.1;else if(q)o=(n.h+n.t).toLowerCase().includes(q)?1:.15;
+    n.el.style.opacity=o;
+    n.ci.setAttribute('stroke',n===sel||n===pathA||n===pathB?'#27231e':'#f4efe4');n.ci.setAttribute('stroke-width',n===sel||n===pathA||n===pathB?3:2);
+    n.forceLab=!!(fi&&fi.set.has(n.id))||n===sel||n===hov;
+  });
+  edges.forEach(e=>{
+    const v=evis(e);e.el.style.display=v?'':'none';
+    if(!v){e.lab.style.display='none';return}
+    let on=false;
+    if(fi){on=fi.set.has(e.s.id)&&fi.set.has(e.t.id)&&(fi.path?pathEdges.has(e):(fi.f?(e.s===fi.f||e.t===fi.f):true))}
+    e.el.style.opacity=fi?(on?1:.05):(q?.15:(e.basis==='i'?.55:.75));
+    e.el.setAttribute('stroke-width',on?2.6:(e.ty==='refine'?1.1:1.6));
+    e.lab.style.display=on&&(fi.f||fi.path)?'':'none';
+  });
+}
+
+// 平移缩放
+let tx=0,ty=0,sc=1,pan=null;
+function apply(){vp.setAttribute('transform',`translate(${tx},${ty}) scale(${sc})`)}
+const toW=(cx,cy)=>[(cx-tx)/sc,(cy-ty)/sc];
+svg.addEventListener('pointerdown',ev=>{if(!dragging){pan={x:ev.clientX-tx,y:ev.clientY-ty};moved=false}});
+addEventListener('pointermove',ev=>{
+  if(dragging){const[w,h]=toW(ev.clientX,ev.clientY);if(Math.abs(w-dragging.sx)+Math.abs(h-dragging.sy)>3)moved=true;dragging.fx=w;dragging.fy=h;alpha=Math.max(alpha,.25)}
+  else if(pan){const nx=ev.clientX-pan.x,ny=ev.clientY-pan.y;if(Math.abs(nx-tx)+Math.abs(ny-ty)>3)moved=true;tx=nx;ty=ny;apply()}
+});
+addEventListener('pointerup',()=>{
+  if(dragging){const n=dragging;n.fx=n.fy=null;dragging=null;if(!moved)select(n)}
+  else if(pan){pan=null;if(!moved){select(null);clearHL()}}
+});
+svg.addEventListener('wheel',ev=>{ev.preventDefault();const f=ev.deltaY<0?1.1:.9,px=ev.clientX,py=ev.clientY;tx=px-(px-tx)*f;ty=py-(py-ty)*f;sc*=f;apply();refresh()},{passive:false});
+function bbox(ids){
+  let x0=1e9,y0=1e9,x1=-1e9,y1=-1e9;
+  nodes.filter(n=>nvis(n)&&(!ids||ids.has(n.id))).forEach(n=>{x0=Math.min(x0,n.sx-60);x1=Math.max(x1,n.sx+60);y0=Math.min(y0,n.sy-20);y1=Math.max(y1,n.sy+34)});
+  return[x0,y0,x1,y1];
+}
+function fit(ids){
+  const[x0,y0,x1,y1]=bbox(ids),L=left.classList.contains('show')?330:0,R=right.classList.contains('show')?370:0,W=innerWidth-L-R,H=innerHeight-70;
+  sc=Math.min(W/(x1-x0),H/(y1-y0),1.5);tx=L+(W-(x1-x0)*sc)/2-x0*sc;ty=64+(H-(y1-y0)*sc)/2-y0*sc;apply();refresh();
+}
+function centerOn(n){const L=left.classList.contains('show')?330:0,R=right.classList.contains('show')?370:0;tx=L+(innerWidth-L-R)/2-n.sx*sc;ty=innerHeight/2-n.sy*sc;apply()}
+
+// 面板:右(命题详情)
+const left=document.getElementById('left'),right=document.getElementById('right'),rin=document.getElementById('rin'),lin=document.getElementById('lin');
+const chTitle=c=>D.chapters[c];
+function relRow(e,dir){
+  const o=dir==='o'?e.t:e.s;
+  const rt=`<span class="rt" style="color:${RELC[e.ty]}">${dir==='o'?REL[e.ty]+' ▸':'▸ '+REL[e.ty]}</span>`;
+  const note=(e.note?` <i>· ${esc(e.note)}</i>`:'')+(e.basis==='i'?' <i>· 推断</i>':'');
+  return `<a class="rel" data-id="${o.id}">${rt}<b>${esc(o.h)}</b>${note}<span class="snip">${esc(o.t.length>46?o.t.slice(0,46)+'…':o.t)}</span></a>`;
+}
+function select(n){
+  sel=n;
+  if(!n){right.classList.remove('show');refresh();return}
+  const out=edges.filter(e=>e.s===n&&evis(e)),inn=edges.filter(e=>e.t===n&&evis(e));
+  let h=`<div class="meta"><span class="tag" style="background:${TYC[n.ty]}">${D.claimTypes[n.ty]}</span><span>${esc(chTitle(n.ch))}</span><span class="tag o">${BS[n.basis]}</span></div>
+  <h2>${esc(n.h)}</h2><p class="lead">${esc(n.t)}</p>
+  <div class="kv"><span><b>${inn.length}</b>被指向</span><span><b>${out.length}</b>指向别处</span><span><b>${A.bridges.includes(n.id)?'是':'—'}</b>桥梁</span></div>
+  <div><button class="pbtn" id="pa">设为路径起点</button><button class="pbtn" id="pb">设为路径终点</button></div>`;
+  if(pathA||pathB)h+=pathBox();
+  if(out.length)h+=`<h3>它指向(${out.length})</h3>`+out.map(e=>relRow(e,'o')).join('');
+  if(inn.length)h+=`<h3>指向它(${inn.length})</h3>`+inn.map(e=>relRow(e,'i')).join('');
+  rin.innerHTML=h;right.classList.add('show');
+  rin.querySelectorAll('.rel').forEach(a=>a.onclick=()=>{const t=nm[a.dataset.id];select(t);centerOn(t)});
+  document.getElementById('pa').onclick=()=>{pathA=n;computePath();select(n)};
+  document.getElementById('pb').onclick=()=>{pathB=n;computePath();select(n)};
+  refresh();
+}
+document.getElementById('x').onclick=()=>{select(null);clearHL()};
+// 路径
+let pathEdges=new Set();
+function computePath(){
+  pathSet=null;pathEdges=new Set();
+  if(!pathA||!pathB||pathA===pathB){refresh();return}
+  const prev={};const q=[pathA];prev[pathA.id]=null;
+  while(q.length){const c=q.shift();if(c===pathB)break;
+    edges.forEach(e=>{if(!evis(e))return;
+      const nb=e.s===c?e.t:(e.t===c?e.s:null);if(nb&&!(nb.id in prev)){prev[nb.id]=[c,e];q.push(nb)}})}
+  if(!(pathB.id in prev)){pathSet=null;pathMsg='这两个命题之间没有连通的路径。';refresh();return}
+  const ids=[];let c=pathB;pathSteps=[];
+  while(c){ids.push(c.id);const p=prev[c.id];if(p){pathEdges.add(p[1]);pathSteps.unshift({from:p[0],to:c,e:p[1]})}c=p?p[0]:null}
+  pathSet=new Set(ids);pathMsg='';refresh();
+}
+let pathSteps=[],pathMsg='';
+function pathBox(){
+  let h='<div class="path"><b style="font-family:var(--serif)">路径查询</b><br>';
+  h+=`起点:${pathA?esc(pathA.h):'未设'} ➜ 终点:${pathB?esc(pathB.h):'未设'}`;
+  if(pathMsg)h+=`<br><span style="color:#a8452a">${pathMsg}</span>`;
+  if(pathSet&&pathSteps.length){h+='<br>'+pathSteps.map(s=>`${esc(s.from.h)} <span style="color:${RELC[s.e.ty]}">${s.e.s===s.from?'—'+REL[s.e.ty]+'→':'←'+REL[s.e.ty]+'—'}</span> ${esc(s.to.h)}`).join('<br>')}
+  h+='<br><button class="pbtn" id="pc">清除路径</button></div>';
+  setTimeout(()=>{const b=document.getElementById('pc');if(b)b.onclick=()=>{pathA=pathB=null;pathSet=null;pathMsg='';select(sel)}});
+  return h;
+}
+function clearHL(){hl=null;if(!pathSet)refresh();else refresh()}
+
+// 面板:左(发现)
+const nm_=id=>esc(nm[id].h);
+function item(label,ids,extra){return `<a class="item" data-ids="${ids.join(',')}"><span class="k">${label}</span>${extra?`<br><i style="font-style:normal;color:#7b7266;font-size:12px">${extra}</i>`:''}</a>`}
+function buildLeft(){
+  const s=A.stats;
+  let h=`<div class="meta" style="letter-spacing:.14em;color:#a8452a">发现 · DISCOVERY</div><h2>从关系里读出的东西</h2>
+  <div class="kv"><span><b>${s.claims}</b>命题</span><span><b>${s.links}</b>关系</span><span><b>${s.communities}</b>社群</span><span><b>${Math.round(s.inferred/s.links*100)}%</b>推断连接</span></div>
+  <p style="font-size:12.5px;line-height:1.7;color:#7b7266;margin:6px 0 0">点击下面任一条,图里会只高亮相关命题。社群由算法按连接疏密自动划分(模块度 ${s.modularity}),不等同于章节。</p>`;
+  h+='<h3>枢纽:连接最多的命题</h3>'+A.hubs.map(i=>item(nm_(i),[i],`${A.degree[i]} 条关系`)).join('');
+  h+='<h3>桥梁:串起不同主题的命题</h3>'+A.bridges.map(i=>item(nm_(i),[i],'去掉它,图会更零散')).join('');
+  h+='<h3>最长的论证链</h3>'+item(A.chain.map(nm_).join(' → '),A.chain,`共 ${A.chain.length} 个命题,从前提一路推到结论`);
+  h+='<h3>回路:互相强化的循环</h3>'+(A.cycles.length?A.cycles.map(c=>item(c.map(nm_).join(' ⇄ '),c,'因果上首尾相接(含推断),值得核对')).join(''):'<div style="font-size:12.5px;color:#7b7266">未发现</div>');
+  h+='<h3>跨越很远的关系(章距 ≥ 4)</h3>'+A.cross.map(c=>item(nm_(c.s)+' ➜ '+nm_(c.t),[c.s,c.t],`相隔 ${c.gap} 章`)).join('');
+  h+='<h3>缺少佐证的观点</h3>'+(A.unsupported.length?A.unsupported.map(i=>item(nm_(i),[i],'没有其他命题支持或细化它')).join(''):'<div style="font-size:12.5px;color:#7b7266">未发现</div>');
+  h+='<h3>社群</h3>'+A.comms.map(c=>item(`<span class="sw" style="display:inline-block;background:${COMMC[c.id%COMMC.length]};margin-right:6px"></span>${esc(c.name)} 一带`,c.members,`${c.members.length} 个命题:${c.members.slice(0,4).map(nm_).join('、')}…`)).join('');
+  lin.innerHTML=h;
+  lin.querySelectorAll('.item').forEach(a=>a.onclick=()=>{const ids=a.dataset.ids.split(',');hl=new Set(ids);sel=null;right.classList.remove('show');pathSet=null;refresh();fit(hl)});
+}
+buildLeft();
+document.getElementById('bd').onclick=()=>{left.classList.toggle('show');if(!left.classList.contains('show')){hl=null;refresh()}};
+document.getElementById('xl').onclick=()=>{left.classList.remove('show');hl=null;refresh()};
+document.getElementById('bf').onclick=()=>{hl=null;fit()};
+
+// 工具栏
+const filt=document.getElementById('filt'),rels=document.getElementById('rels'),legend=document.getElementById('legend');
+function buildFilt(){
+  filt.innerHTML='<label>显示</label>';
+  const items=colorMode==='type'?Object.entries(D.claimTypes).map(([k,v])=>[k,v,TYC[k]]):colorMode==='comm'?A.comms.map(c=>['c'+c.id,c.name+' 一带',COMMC[c.id%COMMC.length]]):D.outline.map(p=>[p.id,p.label+(p.sub?' · '+p.sub:''),p.color]);
+  items.forEach(([k,n,c])=>{const e=document.createElement('span');e.className='chip'+(hiddenK.has(k)?' off':'');e.innerHTML=`<i class="sw" style="background:${c}"></i>${esc(n)}`;
+    e.onclick=()=>{hiddenK.has(k)?hiddenK.delete(k):hiddenK.add(k);e.classList.toggle('off');alpha=.5;if(sel&&!nvis(sel))select(null);refresh()};filt.appendChild(e)});
+}
+function buildRels(){
+  rels.innerHTML='<label>关系</label>';
+  for(const k in REL){const e=document.createElement('span');e.className='chip'+(hiddenR.has(k)?' off':'');e.innerHTML=`<i class="ln" style="border-color:${RELC[k]};${k==='oppose'?'border-top-style:dashed':''}"></i>${REL[k]}`;
+    e.onclick=()=>{hiddenR.has(k)?hiddenR.delete(k):hiddenR.add(k);e.classList.toggle('off');alpha=.5;if(sel)select(sel);else refresh()};rels.appendChild(e)}
+}
+document.querySelectorAll('[data-m]').forEach(c=>c.onclick=()=>{
+  colorMode=c.dataset.m;hiddenK.clear();document.querySelectorAll('[data-m]').forEach(x=>x.classList.toggle('on',x===c));buildFilt();refresh()});
+legend.innerHTML=`<div><i class="ln" style="border-color:#3c5a6b;border-top:2px dotted #3c5a6b"></i>点线:我推断的连接,书中未明说</div><div>箭头:从前一个命题指向后一个 · 圆越大连接越多</div>`;
+buildFilt();buildRels();
+const q=document.getElementById('q');
+q.oninput=()=>{query=q.value;refresh()};
+q.onkeydown=ev=>{if(ev.key==='Enter'&&q.value.trim()){const m=nodes.find(n=>nvis(n)&&(n.h+n.t).toLowerCase().includes(q.value.trim().toLowerCase()));if(m){select(m);centerOn(m)}}};
+refresh();fit();loop();addEventListener('resize',()=>fit());
+</script>
+</body>
+</html>
