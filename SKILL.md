@@ -27,7 +27,7 @@ description: 把一本非虚构书(epub/pdf/txt/md)做成"伴读指南"——一
 ## 环境
 
 ```bash
-python scripts/bk.py --help            # 以下简写为 bk;-w 指定工作目录(默认 work)
+python scripts/bk.py --help            # 以下简写为 bk;-w 指定工作目录(默认 work),放在子命令前或后都行
 ```
 只用标准库。PDF 需要系统有 `pdftotext`(没有就让用户先转成 epub/txt)。输出目录建议一本书一个(`dist/<书名>/`)。
 

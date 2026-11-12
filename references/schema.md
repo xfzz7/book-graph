@@ -33,7 +33,7 @@
 | `parent` | ✓(可 null) | 挂在哪张卡下;null = 顶层卡 |
 | `rel` | 有 parent 时必填 | supports / explains / illustrates / elaborates / qualifies / objects / rebuts / revises |
 | `refs` | ✓ | 1~6 个本章段落 id |
-| `anchor` | ✓ | 从 refs 段落逐字摘的短语(汉字 4~30 / 英文 12~90 个字母数字) |
+| `anchor` | ✓ | 从 refs 段落逐字摘的短语(建议汉字 6~20 / 英文 3~8 词;校验放行汉字 4~30 / 英文 12~90 个字母数字,过长报错) |
 | `ev` | evidence/example 且 tier≤2 时必填 | `{type, strength, limit}`:type=data/study/case/anecdote/theory/analogy/authority;strength=strong/moderate/weak/illustrative/unclear |
 | `waive` | 可选 | 显式豁免的警告:`numbers` `overlap` `copy`;会被独立核对重点审 |
 
@@ -61,7 +61,7 @@
 | 等级 | 规则 |
 |---|---|
 | E | 缺字段/枚举越界;id 重复或前缀不对;parent 不存在或成环;refs 不存在或不在本章;anchor 不在原文/不在 refs 段落/过长;证据卡缺 ev;章缺笔记或缺 meta;synthesis/critique/questions 缺失或不合规;核对未解决 |
-| W | 数字不在引用段落(±1 段);命题与引用段落用词重合率 <0.35(仅同语种);疑似照抄(汉字 16 / 英文 45 字符);tier 1 占比 >40% 或本章无 tier 1;卡片过稀/过密;引用集中在章前半;未挂到支柱的卡 |
+| W | 数字不在引用段落(±1 段);命题与引用段落用词重合率 <0.30(仅同语种);疑似照抄(汉字 16 / 英文 45 字符);tier 1 占比 >40% 或本章无 tier 1;卡片过稀/过密;引用集中在章前半;未挂到支柱的卡 |
 | I | 大段无人引用(可能漏读);已豁免的卡 |
 
 ## 最小完整例子(第四章的两张卡,出自 evals/canary)

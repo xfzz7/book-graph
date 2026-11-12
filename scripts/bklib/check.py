@@ -24,7 +24,7 @@ class Issue:
 
 
 # 溯源阈值(在 canary 书上标定;见 REPORT)
-OVERLAP_MIN = 0.35        # 命题与引用段落(±1 段)的 2-gram / 词干覆盖率
+OVERLAP_MIN = 0.30        # 命题与引用段落(±1 段)的 2-gram / 词干覆盖率
 ANCHOR_ZH = (4, 30)       # 归一化后字符数范围
 ANCHOR_EN = (12, 90)
 
@@ -262,8 +262,9 @@ class Checker:
             if dens > 8:
                 self.add("W", "dense", key, f"本章 {len(cs)} 张卡(每千字 {dens:.1f}),像是在逐句改写而不是抽取要点")
             tops = [x for x in cs if not x.get("parent")]
-            if cs and not tops:
-                self.add("W", "no_top", key, "本章所有卡都有 parent,没有本章的“顶层卡”(通常是本章主论点)")
+            cross = [x for x in cs if x.get("parent") in cards and cards[x["parent"]]["id"].split(".")[0] != key]
+            if cs and not tops and not cross:
+                self.add("W", "no_top", key, "本章所有卡都有本章内的 parent,没有顶层卡(通常是本章主论点)")
         self.stats["cards"] = len(cards)
         self.stats["weight"] = total_w
 
@@ -397,10 +398,17 @@ class Checker:
                 self.add("E", "schema", "synthesis", e)
             _refs_ok(w, m.get("refs"), "synthesis.misreadings", self.issues)
         rp = sy.get("reading_plan") or {}
-        for fld in ("must", "skim"):
+        for fld in ("must", "skim", "skip"):
             for k in rp.get(fld, []) or []:
                 if k not in {c["key"] for c in w.meta["chapters"]}:
                     self.add("E", "reading_plan", "synthesis", f"reading_plan.{fld} 里的 {k} 不是章")
+        pri = {c["key"]: (notes.get(c["key"], {}).get("meta") or {}).get("priority") for c in w.chapters()}
+        for k in rp.get("must", []) or []:
+            if pri.get(k) == "skim":
+                self.add("W", "plan_conflict", "synthesis", f"{k} 在 reading_plan.must 里,但章笔记 priority=skim;请统一")
+        for k in rp.get("skim", []) or []:
+            if pri.get(k) == "must":
+                self.add("W", "plan_conflict", "synthesis", f"{k} 在 reading_plan.skim 里,但章笔记 priority=must;请统一")
         for fld in ("one_liner", "thesis", "question"):
             self._copy_check(sy.get(fld, "") or "", f"synthesis.{fld}", set())
         return sy

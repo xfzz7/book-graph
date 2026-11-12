@@ -90,12 +90,13 @@ def _fault(it: dict, kind: str, w: Work, rng: random.Random):
 
 
 def plan(w: Work, issues, rate: float = 0.25, seed: int = 7, seeds: int = 6, retry: bool = False,
-         batch_budget: int = 9000) -> dict:
+         batch_budget: int = 9000, cap: int = 150) -> dict:
     rng = random.Random(seed)
     cur = items(w)
     log = w.read_json("audit/log.json") or {}
     flagged = {i.where for i in issues if i.level in ("W", "E") and i.code in ("numbers", "overlap", "copy", "anchor_short", "term_not_in_refs", "term_not_in_book")}
     picked: list[str] = []
+    musts: set[str] = set()
     for iid, it in cur.items():
         prev = log.get(iid)
         if retry:
@@ -109,8 +110,14 @@ def plan(w: Work, issues, rate: float = 0.25, seed: int = 7, seeds: int = 6, ret
         must = (it["kind"] == "card" and (it.get("tier") == 1 or it.get("waive") or it.get("voice") in ("other", "hedged")
                                            or (it.get("ckind") == "evidence")))
         must = must or it["kind"] in ("concept", "misreading", "critique") or iid in flagged
+        if must:
+            musts.add(iid)
         if must or rng.random() < rate:
             picked.append(iid)
+    if len(picked) > cap:  # 超出预算:必审项优先,其余随机
+        rest = [i for i in picked if i not in musts]
+        rng.shuffle(rest)
+        picked = [i for i in picked if i in musts][:cap] + rest[:max(0, cap - len(musts))]
     # 种子
     seeded = {}
     pool = [i for i in picked if cur[i]["kind"] in ("card", "question") and cur[i]["refs"]]
