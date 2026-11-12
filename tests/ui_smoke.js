@@ -17,7 +17,7 @@ let chromium; try { ({ chromium } = require('playwright')); } catch (e) { consol
   // 展开全部
   await p.click('#expAll'); const col = await p.$$eval('#v-map .node.collapsed', xs => xs.length); if (col !== 0) fail('展开全部无效');
   // 搜索
-  await p.fill('#q', '回声'); await p.waitForTimeout(100);
+  const term = await p.evaluate(() => Object.values(BOOK.cards)[0].label.slice(0, 2)); await p.fill('#q', term); await p.waitForTimeout(100);
   const vis = await p.$$eval('.item', xs => xs.filter(x => x.offsetParent !== null).length); if (!(vis > 0)) fail('搜索无结果'); 
   await p.fill('#q', ''); 
   // 自测:看答案/标记/持久化

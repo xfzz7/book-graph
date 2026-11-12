@@ -267,6 +267,12 @@ class Checker:
                 self.add("W", "no_top", key, "本章所有卡都有本章内的 parent,没有顶层卡(通常是本章主论点)")
         self.stats["cards"] = len(cards)
         self.stats["weight"] = total_w
+        src_chars = sum(c["chars"] for c in self.w.chapters())
+        anchor_chars = sum(len(c.get("anchor") or "") for c in cards.values())
+        self.stats["anchor_share"] = round(anchor_chars / max(1, src_chars), 3)
+        if anchor_chars / max(1, src_chars) > 0.05:
+            lvl = "W" if src_chars >= 20000 else "I"
+            self.add(lvl, "anchor_budget", "全书", f"检索短语合计 {anchor_chars} 字符,占正文 {anchor_chars / src_chars:.0%};引文应保持在很小的比例(建议 ≤5%),请缩短 anchor 或减少卡片" + ("" if lvl == "W" else "(书很短,仅提示)"))
 
     def _check_coverage(self, cards: dict):
         """哪些大段正文没有任何卡片引用(±1 段内)?只报告,让你判断是不是漏读。"""

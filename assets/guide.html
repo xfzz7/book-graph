@@ -222,7 +222,7 @@ function vQuality(){
   const s=Q.seeds||{};
   let h=`<h2>这份指南有多可靠</h2><p class="sub">每张卡片都钉在原文段落上;下面是自动与独立核对的结果。</p>
   <div class="card"><span class="stat"><b>${Q.cards}</b><span>卡片</span></span><span class="stat"><b>${Q.audited}</b><span>项经独立核对</span></span><span class="stat"><b>${Q.audited?Math.round(100*Q.auditOk/Q.audited)+"%":"—"}</b><span>首轮/当前通过率</span></span>${s.total?`<span class="stat"><b>${s.caught}/${s.total}</b><span>核对者识别出的“故意写坏”条目</span></span>`:""}<span class="stat"><b>${Q.waived}</b><span>被豁免警告的卡片</span></span><span class="stat"><b>${Q.outside}</b><span>审读里的外部判断</span></span></div>
-  <h3>怎么做到的</h3><ul><li>每张卡片有原文段落引用和一个逐字的检索短语;脚本核对该短语确实出现在被引段落里。</li><li>卡片中的数字必须出现在被引段落附近;命题与原文用词重合率、与原文连续相同字符数(防照抄)都有检查。</li><li>独立核对者只拿到“条目 + 原文段落”,按“忠实/说过头/走样/找不到/归因错误/太空泛”判断,批次里混有故意写坏的条目来衡量核对者是否认真。</li><li>本指南不含书中的大段原文;检索短语总共 ${Q.anchorChars} 字,约占全书 ${(100*Q.anchorChars/Math.max(1,Q.sourceWeight)).toFixed(1)}%。</li></ul>
+  <h3>怎么做到的</h3><ul><li>每张卡片有原文段落引用和一个逐字的检索短语;脚本核对该短语确实出现在被引段落里。</li><li>卡片中的数字必须出现在被引段落附近;命题与原文用词重合率、与原文连续相同字符数(防照抄)都有检查。</li><li>独立核对者只拿到“条目 + 原文段落”,按“忠实/说过头/走样/找不到/归因错误/太空泛”判断,批次里混有故意写坏的条目来衡量核对者是否认真。</li><li>本指南不含书中的大段原文;检索短语总共 ${Q.anchorChars} 字,约占全书正文的 ${(100*Q.anchorChars/Math.max(1,Q.sourceChars||Q.sourceWeight)).toFixed(1)}%。</li></ul>
   <h3>已知局限</h3><ul><li>卡片的“承重程度”、论证树的结构、审读判断是 AI 的重构,不是作者的原话;与书不一致时以书为准。</li><li>核对是抽样,不是全量。</li></ul><p class="note">生成日期 ${esc(Q.date||"")} · 来源文件 ${esc(B.meta.sourceFile||"")}</p>`;
   return h}
 

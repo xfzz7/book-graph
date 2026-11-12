@@ -75,6 +75,7 @@ def merge(w: Work) -> dict:
         "seeds": seed, "waived": sum(1 for c in cards.values() if c["waived"]),
         "outside": sum(1 for it in cr.get("items", []) if it.get("source") == "outside"),
         "anchorChars": sum(len(c["loc"]["anchor"]) for c in cards.values()), "sourceWeight": m["total_weight"],
+        "sourceChars": sum(c["chars"] for c in m["chapters"] if not c.get("skip")),
         "date": str(date.today()),
     }
     reading_plan = sy.get("reading_plan", {})
