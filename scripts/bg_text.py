@@ -228,7 +228,7 @@ def split_chapters(lines: list[str], custom: re.Pattern | None, min_chars: int):
     return merged
 
 
-def prepare(src: str, out: str, chunk_chars: int = 12000, min_chars: int = 200,
+def prepare(src: str, out: str, chunk_chars: int = 6000, min_chars: int = 200,
             heading_regex: str | None = None, title: str | None = None, author: str | None = None) -> dict:
     ext = src.lower().rsplit(".", 1)[-1]
     meta_title, meta_author = "", ""

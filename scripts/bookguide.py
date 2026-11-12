@@ -59,18 +59,26 @@ def cmd_prepare(a):
     return 0
 
 
+def _broken(notes) -> list[str]:
+    bad = [f"  !! {cid}: {err}" for cid, (n, err) in notes.items() if err]
+    if bad:
+        print("警告:以下章节笔记无法解析,在修好之前,后续简报会缺少这些章的内容:\n" + "\n".join(bad) + "\n")
+    return bad
+
+
 def cmd_status(a):
     W, man, source, notes, (S, _) = load_work(a.work)
-    todo = [c for c in man["chapters"] if c["id"] not in notes and not c.get("skip_hint")]
+    _broken(notes)
+    todo = [c for c in man["chapters"] if (c["id"] not in notes or notes[c["id"]][1]) and not c.get("skip_hint")]
     print(f"《{man['title']}》 章节笔记 {len(notes)}/{len(man['chapters'])}")
     for c in man["chapters"]:
-        mark = "✓" if c["id"] in notes else ("-" if c.get("skip_hint") else " ")
+        mark = ("✗" if notes[c["id"]][1] else "✓") if c["id"] in notes else ("-" if c.get("skip_hint") else " ")
         print(f"  [{mark}] {c['id']:<4} {c['title']}")
     if todo:
         nxt = todo[0]["id"]
         print(f"\n下一步:{PY} {SKILL}/scripts/bookguide.py brief {a.work} {nxt}")
     elif S is None:
-        print(f"\n下一步:章节笔记已齐。运行 {PY} {SKILL}/scripts/bookguide.py digest {a.work},按 references/synthesis.md 写 work/synthesis.json")
+        print(f"\n下一步:章节笔记已齐。运行 {PY} {SKILL}/scripts/bookguide.py digest {a.work} -o {a.work}/digest.md,按 references/synthesis.md 写 work/synthesis.json")
     elif not (W / "verify" / "verdicts.json").exists():
         print(f"\n下一步:运行 verify-sheet {a.work},按 references/verify.md 完成事实核查")
     else:
@@ -80,6 +88,8 @@ def cmd_status(a):
 
 def cmd_brief(a):
     W, man, source, notes, _ = load_work(a.work)
+    if _broken(notes):
+        return 1
     chs = man["chapters"]
     idx = next((i for i, c in enumerate(chs) if c["id"] == a.chapter), None)
     if idx is None:
@@ -111,15 +121,15 @@ def cmd_brief(a):
     closed = set()
     for c in prev:
         for x in (notes[c["id"]][0].get("threads") or {}).get("closes", []):
-            m = re.match(r"^\s*(c\d+#\d+)", x if isinstance(x, str) else "")
-            if m:
+            m = re.match(r"^\s*(c\d+#\d+)\s*(\((部分|partial)\)|(部分|partial))?", x if isinstance(x, str) else "")
+            if m and not m.group(2):
                 closed.add(m.group(1))
     opens = [(f"{c['id']}#{i}", c["title"], o) for c in prev
              for i, o in enumerate((notes[c["id"]][0].get("threads") or {}).get("opens", []), 1)]
     opens = [x for x in opens if x[0] not in closed]
     if opens:
         out += ["## 前文留下、尚未回应的线索", "",
-                "本章若回应了其中某条,在 threads.closes 里写 \"编号: 怎么回应的\",如 \"c1#2: 本章说明了……\"。", ""]
+                "本章若回应了其中某条,在 threads.closes 里写 \"编号: 怎么回应的\",如 \"c1#2: 本章说明了……\";只回应了一部分写 \"c1#2(部分): ……\",该线索会继续保留。", ""]
         out += [f"- {tid}({title}){o}" for tid, title, o in opens]
         out.append("")
     out += ["## 本章阅读安排", "",
@@ -133,6 +143,8 @@ def cmd_brief(a):
 
 def cmd_digest(a):
     W, man, source, notes, _ = load_work(a.work)
+    if _broken(notes):
+        return 1
     out = [f"# 《{man['title']}》章节笔记汇编(全书综合的输入)", ""]
     for c in man["chapters"]:
         n = notes.get(c["id"], (None, None))[0]
@@ -166,8 +178,8 @@ def cmd_check(a):
 
 
 def cmd_verify_sheet(a):
-    p = make_verify_sheet(a.work, a.random)
-    print(f"已生成 {p}\n请按 references/verify.md 逐条核对,结论写入 {Path(a.work) / 'verify' / 'verdicts.json'}")
+    p = make_verify_sheet(a.work, a.random, a.batch)
+    print(f"已生成 {p}(及按批拆分的 sheet-1.md、sheet-2.md…,可分批交给核查者)\n请按 references/verify.md 逐条核对,结论写入 {Path(a.work) / 'verify' / 'verdicts.json'}")
     return 0
 
 
@@ -188,7 +200,7 @@ def main(argv=None) -> int:
     p = sp.add_parser("prepare")
     p.add_argument("input")
     p.add_argument("-o", "--out", default="work")
-    p.add_argument("--chunk-chars", type=int, default=12000, help="每个阅读分块的字符上限")
+    p.add_argument("--chunk-chars", type=int, default=6000, help="每个阅读分块的字符上限")
     p.add_argument("--min-chars", type=int, default=200, help="短于此的块并入前一章")
     p.add_argument("--heading-regex", help="自定义章标题正则(匹配到的行作为章标题)")
     p.add_argument("--title")
@@ -213,6 +225,7 @@ def main(argv=None) -> int:
     p = sp.add_parser("verify-sheet")
     p.add_argument("work")
     p.add_argument("--random", type=int, default=10, help="随机抽查条数")
+    p.add_argument("--batch", type=int, default=25, help="每个分批核查单的条目数")
     p.set_defaults(f=cmd_verify_sheet)
     p = sp.add_parser("build")
     p.add_argument("work")

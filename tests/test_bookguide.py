@@ -125,7 +125,7 @@ class TestCheck(unittest.TestCase):
         self.assertTrue(any("c9.9" in e for e in R.errors))
 
     def test_verification_loop(self):
-        self.edit("verify/verdicts.json", lambda d: d[0].update(verdict="wrong", reason="x"))
+        self.edit("verify/verdicts.json", lambda d: d[0].update(verdict="wrong", reason="x", fix="y"))
         R = run_check(str(self.w))
         self.assertTrue(any("[核查]" in e for e in R.errors))
         bad = json.loads((self.w / "verify/verdicts.json").read_text(encoding="utf-8"))[0]["id"]
@@ -143,6 +143,49 @@ class TestCheck(unittest.TestCase):
         self.assertIn("容易读错的地方", md)
         self.assertIn("第一章 ¶2", md)
         self.assertEqual(len(files[2].read_text(encoding="utf-8").strip().splitlines()), 8 + 2)
+
+
+class TestCli(unittest.TestCase):
+    def setUp(self):
+        self.tmp = Path(tempfile.mkdtemp())
+        self.w = make_work(self.tmp)
+
+    def tearDown(self):
+        shutil.rmtree(self.tmp)
+
+    def run_cli(self, *args):
+        import io
+        from contextlib import redirect_stdout
+        import bookguide
+        buf = io.StringIO()
+        with redirect_stdout(buf):
+            rc = bookguide.main([str(x) for x in args])
+        return rc, buf.getvalue()
+
+    def test_broken_notes_are_loud(self):
+        (self.w / "notes" / "c1.json").write_text('{"chapter": "c1", "question": "坏"引号"}', encoding="utf-8")
+        rc, out = self.run_cli("brief", self.w, "c3")
+        self.assertEqual(rc, 1)
+        self.assertIn("无法解析", out)
+        rc, out = self.run_cli("status", self.w)
+        self.assertIn("✗", out)
+
+    def test_threads_closed_and_partial(self):
+        rc, out = self.run_cli("brief", self.w, "c3")
+        self.assertNotIn("c1#1", out)                       # c2 已完整回应
+        p = self.w / "notes" / "c2.json"
+        d = json.loads(p.read_text(encoding="utf-8"))
+        d["threads"]["closes"] = ["c1#1(部分): 只回答了一半"]
+        p.write_text(json.dumps(d, ensure_ascii=False), encoding="utf-8")
+        rc, out = self.run_cli("brief", self.w, "c3")
+        self.assertIn("c1#1", out)
+
+    def test_verify_sheet_batches(self):
+        rc, out = self.run_cli("verify-sheet", self.w, "--batch", "5")
+        parts = sorted((self.w / "verify").glob("sheet-*.md"))
+        n = len(json.loads((self.w / "verify" / "sheet.json").read_text(encoding="utf-8")))
+        self.assertEqual(len(parts), -(-n // 5))
+        self.assertIn("S:K1", (self.w / "verify" / "sheet.md").read_text(encoding="utf-8"))
 
 
 class TestPrimitives(unittest.TestCase):

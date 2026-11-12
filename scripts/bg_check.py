@@ -373,12 +373,13 @@ def run_check(work: str, chapter: str | None = None, copy_n: int | None = None) 
             check_synthesis(S, all_claims(notes), notes, man, source, R)
             check_verification(W, all_claims(notes), R, S)
         # 篇幅:导读是帮人读书的,不是重写这本书
-        gen = sum(len(t) for _, o in objs for _, t in text_fields(o))
+        # 章节里的概念定义会被合并进词表,不重复计入
+        gen = sum(len(t) for _, o in objs for path, t in text_fields(o) if not path.startswith("concepts"))
         ratio = gen / max(1, man["total_chars"])
-        R.i(f"生成文字约 {gen} 字符,为原书的 {ratio:.0%}")
+        R.i(f"生成文字约 {gen} 字符,为原书的 {ratio:.1%}")
         limit = 0.30 if man["total_chars"] > 50000 else 1.0
         if man["total_chars"] > 3000 and ratio > limit:
-            R.w(f"导读篇幅达到原书的 {ratio:.0%}(建议 ≤{limit:.0%}):删掉 weight 1 的细节命题、合并重复,导读不是复述")
+            R.w(f"导读篇幅为原书的 {ratio:.1%},超过建议上限 {limit:.0%}:删掉 weight 1 的细节命题、合并重复,导读不是复述")
         per_k = len(claims) / max(1, man["total_chars"] / (1000 if lang == "zh" else 600))
         if man["total_chars"] > 3000 and per_k > 4:
             R.w(f"命题密度 {per_k:.1f} 条/千字,偏高:是不是把每段都改写了一遍?")
@@ -417,7 +418,7 @@ def synthesis_items(S: dict, claims: dict) -> dict:
     return out
 
 
-def make_verify_sheet(work: str, n_random: int = 10, seed: int = 7) -> Path:
+def make_verify_sheet(work: str, n_random: int = 10, batch: int = 25, seed: int = 7) -> Path:
     """抽出需要回到原文核对的命题:全书骨架上的全部 + 贴合度最低的 + 随机抽样。"""
     W, man, source, notes, (S, _) = load_work(work)
     lang = man.get("lang", "zh")
@@ -448,18 +449,20 @@ def make_verify_sheet(work: str, n_random: int = 10, seed: int = 7) -> Path:
     (W / "verify" / "sheet.json").write_text(json.dumps(items, ensure_ascii=False, indent=1), encoding="utf-8")
     lines = ["# 事实核查单", "",
              "对每一条:只根据下面给出的原文段落判断命题是否成立。把结论写进 work/verify/verdicts.json。", ""]
+    blocks = []
     for it in items:
+        blk: list[str] = []
         if it["id"].startswith("S:"):
             text, ids, anchors = syn[it["id"]]
-            lines += [f"## {it['id']}({it['why']})", "", f"- 陈述:{text}", ""]
+            blk += [f"## {it['id']}({it['why']})", "", f"- 陈述:{text}", ""]
             for x in ids:
                 if x in claims:
-                    lines.append(f"- 依据命题 {x}:{claims[x]['text']}")
+                    blk.append(f"- 依据命题 {x}:{claims[x]['text']}")
                     anchors = anchors + claims[x].get("anchors", [])
-            lines += ["", "原文:", ""]
+            blk += ["", "原文:", ""]
         else:
             c = claims[it["id"]]
-            lines += [f"## {it['id']}({it['why']})", "",
+            blk += [f"## {it['id']}({it['why']})", "",
                       f"- 命题:{c['text']}",
                       f"- 类型:{c.get('kind')} / 声音:{c.get('voice', 'author')}", "", "原文:", ""]
             anchors = c.get("anchors", [])
@@ -468,8 +471,16 @@ def make_verify_sheet(work: str, n_random: int = 10, seed: int = 7) -> Path:
             for k in expand_anchor(a, source) or []:
                 if k not in seen:
                     seen.add(k)
-                    lines.append(f"> [{k}] {source[k.split('.')[0]][k]}")
-        lines.append("")
+                    blk.append(f"> [{k}] {source[k.split('.')[0]][k]}")
+        blk.append("")
+        blocks.append(blk)
+    head = lines
+    for f in (W / "verify").glob("sheet-*.md"):
+        f.unlink()
+    for i in range(0, len(blocks), batch):
+        part = [x for blk in blocks[i:i + batch] for x in blk]
+        (W / "verify" / f"sheet-{i // batch + 1}.md").write_text("\n".join(head + part), encoding="utf-8")
+    lines = head + [x for blk in blocks for x in blk]
     p = W / "verify" / "sheet.md"
     p.write_text("\n".join(lines), encoding="utf-8")
     return p
@@ -497,6 +508,8 @@ def check_verification(W: Path, claims: dict, R: Report, S: dict | None = None):
             continue
         if v["verdict"] != "ok":
             bad += 1
+            if not v.get("reason") or not v.get("fix"):
+                R.e(f"[核查] {it['id']} 判为 {v['verdict']},但缺少 reason 或 fix")
             if it["id"].startswith("S:"):
                 cur = synthesis_items(S or {}, claims).get(it["id"])
                 same = cur is not None and text_hash(cur[0]) == it["hash"]
