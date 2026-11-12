@@ -160,10 +160,38 @@ def _read_pdf(path: Path) -> list[str]:
         except ImportError as e:
             raise SystemExit("读 PDF 需要 pdftotext(poppler-utils)或 pypdf;也可以先自行转成 txt 再运行。") from e
         text = "\n\n".join((pg.extract_text() or "") for pg in pypdf.PdfReader(str(path)).pages)
-    text = text.replace("\f", "\n\n")
     if len(text.strip()) < 500:
         raise SystemExit("PDF 里几乎抽不出文字(可能是扫描版)。请先 OCR 成文本再运行。")
-    return _txt_to_lines(text)
+    return _pdf_text_to_lines(text)
+
+
+def _pdf_text_to_lines(text: str) -> list[str]:
+    """PDF 抽出的文本没有可靠的段落标记:按"行明显短于版心宽度且以句末标点结束"判断段落结束,
+    跨页的段落自动接上;页码行丢弃。页眉页脚若每页重复,需要人工留意。"""
+    text = nfkc(text.replace("\r", "")).replace("\u00a0", " ")
+    text = re.sub(r"-\n(?=[a-z])", "", text)
+    raw = [re.sub(r"\s+", " ", l).strip() for l in text.replace("\f", "\n").split("\n")]
+    raw = [l for l in raw if l and not re.fullmatch(r"[-–—\s]*\d{1,4}[-–—\s]*", l)]
+    if not raw:
+        return []
+    lens = sorted(len(l) for l in raw)
+    width = lens[int(len(lens) * 0.9)]
+    out, cur = [], ""
+    for l in raw:
+        if _is_heading(l) and len(l) < 0.7 * width:
+            if cur:
+                out.append(cur)
+                cur = ""
+            out.append(l)
+            continue
+        sep = "" if (not cur or cjk_ratio(cur[-1:]) or cjk_ratio(l[:1])) else " "
+        cur += sep + l
+        if len(l) < 0.85 * width and re.search(r"[。!?!?.…:][”」』\"')）]*$", l):
+            out.append(cur)
+            cur = ""
+    if cur:
+        out.append(cur)
+    return out
 
 
 # ---------------------------------------------------------------- 分章
