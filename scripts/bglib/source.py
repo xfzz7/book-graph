@@ -315,6 +315,8 @@ def prepare(src: str, work: str, by: str = "auto", toc_depth: int | None = None,
             lines = _read_pdf(path)
         else:
             lines = _txt_to_lines(path.read_text(encoding="utf-8", errors="ignore"))
+        if lines and len(lines[0]) <= 30 and not _is_heading(lines[0], extra):
+            meta["title"] = lines[0].strip("《》 ")       # 纯文本:首行短句当作书名(可用 --title 覆盖)
         chapters = _split_by_headings(lines, extra, use_h_tags=False)
 
     # 过短的"章"(目录页里的标题行、空白分隔页)并入前一章
