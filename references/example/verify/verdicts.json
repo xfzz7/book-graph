@@ -1,1 +1,98 @@
-[{"id": "c1.3", "verdict": "ok"}, {"id": "c1.2", "verdict": "ok"}, {"id": "c2.1", "verdict": "ok"}, {"id": "c2.2", "verdict": "ok"}, {"id": "c3.1", "verdict": "ok"}, {"id": "c1.1", "verdict": "ok"}, {"id": "c3.2", "verdict": "ok"}, {"id": "c2.3", "verdict": "ok"}]
+[
+ {
+  "id": "c1.3",
+  "verdict": "ok"
+ },
+ {
+  "id": "c1.2",
+  "verdict": "ok"
+ },
+ {
+  "id": "c2.1",
+  "verdict": "ok"
+ },
+ {
+  "id": "c2.2",
+  "verdict": "ok"
+ },
+ {
+  "id": "c3.1",
+  "verdict": "ok"
+ },
+ {
+  "id": "c1.1",
+  "verdict": "ok"
+ },
+ {
+  "id": "c3.2",
+  "verdict": "ok"
+ },
+ {
+  "id": "c2.3",
+  "verdict": "ok"
+ },
+ {
+  "id": "S:answer",
+  "verdict": "ok"
+ },
+ {
+  "id": "S:K1",
+  "verdict": "ok"
+ },
+ {
+  "id": "S:K2",
+  "verdict": "ok"
+ },
+ {
+  "id": "S:K3",
+  "verdict": "ok"
+ },
+ {
+  "id": "S:mis1",
+  "verdict": "ok"
+ },
+ {
+  "id": "S:mis2",
+  "verdict": "ok"
+ },
+ {
+  "id": "S:quiz1",
+  "verdict": "ok"
+ },
+ {
+  "id": "S:quiz2",
+  "verdict": "ok"
+ },
+ {
+  "id": "S:quiz3",
+  "verdict": "ok"
+ },
+ {
+  "id": "S:quiz4",
+  "verdict": "ok"
+ },
+ {
+  "id": "S:quiz5",
+  "verdict": "ok"
+ },
+ {
+  "id": "S:quiz6",
+  "verdict": "ok"
+ },
+ {
+  "id": "S:quiz7",
+  "verdict": "ok"
+ },
+ {
+  "id": "S:quiz8",
+  "verdict": "ok"
+ },
+ {
+  "id": "S:admit1",
+  "verdict": "ok"
+ },
+ {
+  "id": "S:admit2",
+  "verdict": "ok"
+ }
+]

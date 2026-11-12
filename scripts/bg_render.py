@@ -76,7 +76,30 @@ def assemble(work: str, ui: str | None = None) -> dict:
             continue
         chapters.append({"id": ch["id"], "title": ch["title"], "label": labels[ch["id"]], "part": ch.get("part", ""),
                          **{k: n.get(k) for k in ("question", "answer", "role", "claims", "concepts", "links", "threads")}})
-    claims = all_claims(notes)
+    # 读者看的文字里不能出现内部章节 id:c3 → 第二章;c1#2 这样的线索编号 → 对应问题原文
+    opens = {}
+    for ch in chapters:
+        for i, o in enumerate((ch.get("threads") or {}).get("opens", []), 1):
+            opens[f"{ch['id']}#{i}"] = (ch["id"], o)
+
+    def human(t: str) -> str:
+        m = re.match(r"^\s*(c\d+#\d+)\s*[::]?\s*(.*)$", t, re.S)
+        if m and m.group(1) in opens:
+            cid, q = opens[m.group(1)]
+            t = f"「{q}」({labels.get(cid, cid)}提出)" + (f" —— {m.group(2)}" if m.group(2) else "")
+        return re.sub(r"(?<![A-Za-z0-9.#])c(\d+)(?![\d.#])", lambda x: labels.get("c" + x.group(1), x.group(0)), t)
+
+    def walk(o, key=""):
+        if isinstance(o, dict):
+            return {k: (v if k in ("id", "from", "to", "anchors", "because", "evidence", "claims", "chapters",
+                                   "kind", "voice", "rel", "role", "type", "chapter") else walk(v, k)) for k, v in o.items()}
+        if isinstance(o, list):
+            return [walk(v, key) for v in o]
+        return human(o) if isinstance(o, str) else o
+
+    S = walk(S)
+    chapters = [walk(c) for c in chapters]
+    claims = walk(all_claims(notes))
     links = [dict(l, scope="chapter") for c in chapters for l in (c.get("links") or [])]
     links += [dict(l, scope="cross") for l in S.get("cross_links") or []]
     return {"ui": ui, "L": L[ui], "T": TXT[ui], "title": S.get("title") or man["title"],

@@ -287,8 +287,9 @@ def check_synthesis(S: dict, claims: dict, notes: dict, man: dict, source: dict,
     if not lim.get("critique"):
         R.w("[synthesis] limits.critique 为空:没有任何独立评估")
     qz = S.get("quiz", [])
-    if qz and len(qz) < 8:
-        R.w(f"[synthesis] quiz 只有 {len(qz)} 题,建议 8–15 题")
+    qmin = min(8, max(5, len(man["chapters"])))
+    if qz and len(qz) < qmin:
+        R.w(f"[synthesis] quiz 只有 {len(qz)} 题,建议至少 {qmin} 题")
     types = set()
     for i, q in enumerate(qz):
         types.add(q.get("type"))
@@ -370,13 +371,17 @@ def run_check(work: str, chapter: str | None = None, copy_n: int | None = None) 
             R.e("缺少 synthesis.json(全书综合还没做)")
         else:
             check_synthesis(S, all_claims(notes), notes, man, source, R)
-            check_verification(W, all_claims(notes), R)
+            check_verification(W, all_claims(notes), R, S)
         # 篇幅:导读是帮人读书的,不是重写这本书
         gen = sum(len(t) for _, o in objs for _, t in text_fields(o))
         ratio = gen / max(1, man["total_chars"])
         R.i(f"生成文字约 {gen} 字符,为原书的 {ratio:.0%}")
-        if man["total_chars"] > 50000 and ratio > 0.30:
-            R.w(f"生成内容达到原书的 {ratio:.0%}:导读在复述全书,请压缩")
+        limit = 0.30 if man["total_chars"] > 50000 else 1.0
+        if man["total_chars"] > 3000 and ratio > limit:
+            R.w(f"导读篇幅达到原书的 {ratio:.0%}(建议 ≤{limit:.0%}):删掉 weight 1 的细节命题、合并重复,导读不是复述")
+        per_k = len(claims) / max(1, man["total_chars"] / (1000 if lang == "zh" else 600))
+        if man["total_chars"] > 3000 and per_k > 4:
+            R.w(f"命题密度 {per_k:.1f} 条/千字,偏高:是不是把每段都改写了一遍?")
     R.i(f"命题 {len(claims)} 条")
     return R
 
@@ -384,7 +389,32 @@ def run_check(work: str, chapter: str | None = None, copy_n: int | None = None) 
 # ---------- 事实核查闭环 ----------
 
 def claim_hash(c: dict) -> str:
-    return hashlib.sha1((c.get("text", "") + "|" + ",".join(c.get("anchors", []))).encode()).hexdigest()[:10]
+    key = "|".join([c.get("text", ""), ",".join(c.get("anchors", [])), str(c.get("kind")), str(c.get("voice", "author"))])
+    return hashlib.sha1(key.encode()).hexdigest()[:10]
+
+
+def text_hash(t: str) -> str:
+    return hashlib.sha1(t.encode()).hexdigest()[:10]
+
+
+def synthesis_items(S: dict, claims: dict) -> dict:
+    """综合层里会直接影响读者理解的陈述:id -> (文字, 依据命题ids, 依据锚点)。"""
+    out = {}
+    if not S:
+        return out
+    if S.get("answer"):
+        ids = [x for k in S.get("key_ideas", []) for x in (k.get("because") or [])][:6]
+        out["S:answer"] = (S["answer"], ids, [])
+    for k in S.get("key_ideas", []):
+        out[f"S:{k.get('id')}"] = (f"{k.get('title', '')}——{k.get('text', '')}",
+                                   (k.get("because") or []) + (k.get("evidence") or []), [])
+    for i, m in enumerate(S.get("misreadings", []), 1):
+        out[f"S:mis{i}"] = (f"误读:{m.get('wrong', '')} → 纠正:{m.get('right', '')}", [], m.get("anchors", []))
+    for i, q in enumerate(S.get("quiz", []), 1):
+        out[f"S:quiz{i}"] = (f"问:{q.get('q', '')} 答:{q.get('answer', '')}", [], q.get("anchors", []))
+    for i, x in enumerate((S.get("limits") or {}).get("author_admits", []), 1):
+        out[f"S:admit{i}"] = (x.get("text", ""), [], x.get("anchors", []))
+    return out
 
 
 def make_verify_sheet(work: str, n_random: int = 10, seed: int = 7) -> Path:
@@ -403,7 +433,8 @@ def make_verify_sheet(work: str, n_random: int = 10, seed: int = 7) -> Path:
     for c in claims.values():
         if c.get("voice") == "reported":
             pick.setdefault(c["id"], "他人观点(核对是否误归给作者)")
-    scored = sorted(claims, key=lambda x: overlap(claims[x]["text"], anchor_text(claims[x].get("anchors"), source), lang))
+    scored = sorted((x for x in claims if x not in pick),
+                    key=lambda x: overlap(claims[x]["text"], anchor_text(claims[x].get("anchors"), source), lang))
     for x in scored[:5]:
         pick.setdefault(x, "贴合度最低")
     rest = [x for x in claims if x not in pick]
@@ -411,26 +442,40 @@ def make_verify_sheet(work: str, n_random: int = 10, seed: int = 7) -> Path:
     for x in rest[:n_random]:
         pick.setdefault(x, "随机抽查")
     items = [{"id": x, "why": why, "hash": claim_hash(claims[x])} for x, why in pick.items() if x in claims]
+    syn = synthesis_items(S, claims)
+    items += [{"id": k, "why": "综合层陈述", "hash": text_hash(v[0])} for k, v in syn.items()]
     (W / "verify").mkdir(exist_ok=True)
     (W / "verify" / "sheet.json").write_text(json.dumps(items, ensure_ascii=False, indent=1), encoding="utf-8")
     lines = ["# 事实核查单", "",
              "对每一条:只根据下面给出的原文段落判断命题是否成立。把结论写进 work/verify/verdicts.json。", ""]
     for it in items:
-        c = claims[it["id"]]
-        lines += [f"## {it['id']}({it['why']})", "",
-                  f"- 命题:{c['text']}",
-                  f"- 类型:{c.get('kind')} / 声音:{c.get('voice', 'author')}",
-                  f"- 锚点:{', '.join(c.get('anchors', []))}", "", "原文:", ""]
-        for a in c.get("anchors", []):
+        if it["id"].startswith("S:"):
+            text, ids, anchors = syn[it["id"]]
+            lines += [f"## {it['id']}({it['why']})", "", f"- 陈述:{text}", ""]
+            for x in ids:
+                if x in claims:
+                    lines.append(f"- 依据命题 {x}:{claims[x]['text']}")
+                    anchors = anchors + claims[x].get("anchors", [])
+            lines += ["", "原文:", ""]
+        else:
+            c = claims[it["id"]]
+            lines += [f"## {it['id']}({it['why']})", "",
+                      f"- 命题:{c['text']}",
+                      f"- 类型:{c.get('kind')} / 声音:{c.get('voice', 'author')}", "", "原文:", ""]
+            anchors = c.get("anchors", [])
+        seen = set()
+        for a in anchors:
             for k in expand_anchor(a, source) or []:
-                lines.append(f"> [{k}] {source[k.split('.')[0]][k]}")
+                if k not in seen:
+                    seen.add(k)
+                    lines.append(f"> [{k}] {source[k.split('.')[0]][k]}")
         lines.append("")
     p = W / "verify" / "sheet.md"
     p.write_text("\n".join(lines), encoding="utf-8")
     return p
 
 
-def check_verification(W: Path, claims: dict, R: Report):
+def check_verification(W: Path, claims: dict, R: Report, S: dict | None = None):
     sheet_p, ver_p = W / "verify" / "sheet.json", W / "verify" / "verdicts.json"
     if not sheet_p.exists():
         R.e("还没有生成事实核查单:运行 bookguide.py verify-sheet")
@@ -452,8 +497,13 @@ def check_verification(W: Path, claims: dict, R: Report):
             continue
         if v["verdict"] != "ok":
             bad += 1
-            c = claims.get(it["id"])
-            if c is not None and claim_hash(c) == it["hash"]:
-                R.e(f"[核查] {it['id']} 被判为 {v['verdict']}({v.get('reason', '')}),但命题和锚点都还没改")
+            if it["id"].startswith("S:"):
+                cur = synthesis_items(S or {}, claims).get(it["id"])
+                same = cur is not None and text_hash(cur[0]) == it["hash"]
+            else:
+                c = claims.get(it["id"])
+                same = c is not None and claim_hash(c) == it["hash"]
+            if same:
+                R.e(f"[核查] {it['id']} 被判为 {v['verdict']}({v.get('reason', '')}),但还没有修改")
     if sheet:
         R.i(f"事实核查:{len(sheet)} 条,其中 {bad} 条有问题(需要已修正)")

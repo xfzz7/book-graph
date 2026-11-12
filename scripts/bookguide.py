@@ -16,6 +16,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
 import sys
 from pathlib import Path
 
@@ -26,6 +27,7 @@ from bg_render import build  # noqa: E402
 from bg_text import prepare  # noqa: E402
 
 SKILL = Path(__file__).resolve().parent.parent
+PY = Path(sys.executable).name or "python3"
 
 
 def _print_report(R, quiet_info=False) -> int:
@@ -66,9 +68,9 @@ def cmd_status(a):
         print(f"  [{mark}] {c['id']:<4} {c['title']}")
     if todo:
         nxt = todo[0]["id"]
-        print(f"\n下一步:python {SKILL}/scripts/bookguide.py brief {a.work} {nxt}")
+        print(f"\n下一步:{PY} {SKILL}/scripts/bookguide.py brief {a.work} {nxt}")
     elif S is None:
-        print(f"\n下一步:章节笔记已齐。运行 digest {a.work},按 references/synthesis.md 写 work/synthesis.json")
+        print(f"\n下一步:章节笔记已齐。运行 {PY} {SKILL}/scripts/bookguide.py digest {a.work},按 references/synthesis.md 写 work/synthesis.json")
     elif not (W / "verify" / "verdicts.json").exists():
         print(f"\n下一步:运行 verify-sheet {a.work},按 references/verify.md 完成事实核查")
     else:
@@ -106,16 +108,25 @@ def cmd_brief(a):
         out += ["## 已登记的概念(本章再出现时沿用同一个 term,不要另起名字)", ""]
         out += [f"- {x['term']}({cid}):{x['definition']}" for cid, x in concepts]
         out.append("")
-    opens = [(c["id"], o) for c in prev for o in (notes[c["id"]][0].get("threads") or {}).get("opens", [])]
+    closed = set()
+    for c in prev:
+        for x in (notes[c["id"]][0].get("threads") or {}).get("closes", []):
+            m = re.match(r"^\s*(c\d+#\d+)", x if isinstance(x, str) else "")
+            if m:
+                closed.add(m.group(1))
+    opens = [(f"{c['id']}#{i}", c["title"], o) for c in prev
+             for i, o in enumerate((notes[c["id"]][0].get("threads") or {}).get("opens", []), 1)]
+    opens = [x for x in opens if x[0] not in closed]
     if opens:
-        out += ["## 前文留下的线索(本章若有回应,写进 threads.closes)", ""]
-        out += [f"- ({cid}) {o}" for cid, o in opens]
+        out += ["## 前文留下、尚未回应的线索", "",
+                "本章若回应了其中某条,在 threads.closes 里写 \"编号: 怎么回应的\",如 \"c1#2: 本章说明了……\"。", ""]
+        out += [f"- {tid}({title}){o}" for tid, title, o in opens]
         out.append("")
     out += ["## 本章阅读安排", "",
             f"原文:{W / me['file']}(共 {me['paras']} 段)",
             f"按分块依次读:{', '.join(me['chunks'])}(每块读完先把命题记下,再读下一块)", "",
             f"写入:{W / 'notes' / (me['id'] + '.json')}(格式见 references/chapter-pass.md)",
-            f"写完运行:python {SKILL}/scripts/bookguide.py check {a.work} --chapter {me['id']}"]
+            f"写完运行:{PY} {SKILL}/scripts/bookguide.py check {a.work} --chapter {me['id']}"]
     print("\n".join(out))
     return 0
 

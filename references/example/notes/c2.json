@@ -15,5 +15,5 @@
     {"from": "c2.2", "to": "c2.1", "rel": "supports"},
     {"from": "c2.1", "to": "c2.3", "rel": "requires"}
   ],
-  "threads": {"opens": [], "closes": ["回答了第一章'该从哪里起步估计'的问题"]}
+  "threads": {"opens": [], "closes": ["c1#1: 用过去类似任务的实际耗时作为估计的起点"]}
 }

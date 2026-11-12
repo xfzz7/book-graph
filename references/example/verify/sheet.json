@@ -2,41 +2,121 @@
  {
   "id": "c1.3",
   "why": "关键思想",
-  "hash": "12bbe3a53f"
+  "hash": "b24e448dab"
  },
  {
   "id": "c1.2",
   "why": "关键思想",
-  "hash": "1c7ddd3675"
+  "hash": "81a6799af5"
  },
  {
   "id": "c2.1",
   "why": "关键思想",
-  "hash": "8e05cfc417"
+  "hash": "cdb8a6fe9c"
  },
  {
   "id": "c2.2",
   "why": "关键思想",
-  "hash": "0565f2792f"
+  "hash": "a789bf274b"
  },
  {
   "id": "c3.1",
   "why": "关键思想",
-  "hash": "74ded2e5a0"
+  "hash": "3294d7c1c2"
  },
  {
   "id": "c1.1",
   "why": "论证主线",
-  "hash": "214c3ebdf8"
+  "hash": "99ee062b39"
  },
  {
   "id": "c3.2",
   "why": "论证主线",
-  "hash": "adf60a289c"
+  "hash": "96bba8bf14"
  },
  {
   "id": "c2.3",
-  "why": "随机抽查",
-  "hash": "f9b712bba3"
+  "why": "贴合度最低",
+  "hash": "3f470a02f3"
+ },
+ {
+  "id": "S:answer",
+  "why": "综合层陈述",
+  "hash": "03c9e43501"
+ },
+ {
+  "id": "S:K1",
+  "why": "综合层陈述",
+  "hash": "8784f9e9c4"
+ },
+ {
+  "id": "S:K2",
+  "why": "综合层陈述",
+  "hash": "dcd0391b61"
+ },
+ {
+  "id": "S:K3",
+  "why": "综合层陈述",
+  "hash": "cb7236fd00"
+ },
+ {
+  "id": "S:mis1",
+  "why": "综合层陈述",
+  "hash": "07f95738ea"
+ },
+ {
+  "id": "S:mis2",
+  "why": "综合层陈述",
+  "hash": "642c52077f"
+ },
+ {
+  "id": "S:quiz1",
+  "why": "综合层陈述",
+  "hash": "07e0ce12ed"
+ },
+ {
+  "id": "S:quiz2",
+  "why": "综合层陈述",
+  "hash": "4735c4c31f"
+ },
+ {
+  "id": "S:quiz3",
+  "why": "综合层陈述",
+  "hash": "cf8b776399"
+ },
+ {
+  "id": "S:quiz4",
+  "why": "综合层陈述",
+  "hash": "aef2498b87"
+ },
+ {
+  "id": "S:quiz5",
+  "why": "综合层陈述",
+  "hash": "8d9e0f4b68"
+ },
+ {
+  "id": "S:quiz6",
+  "why": "综合层陈述",
+  "hash": "b9882836d6"
+ },
+ {
+  "id": "S:quiz7",
+  "why": "综合层陈述",
+  "hash": "daa6059528"
+ },
+ {
+  "id": "S:quiz8",
+  "why": "综合层陈述",
+  "hash": "610d8c8f43"
+ },
+ {
+  "id": "S:admit1",
+  "why": "综合层陈述",
+  "hash": "d92cabb38d"
+ },
+ {
+  "id": "S:admit2",
+  "why": "综合层陈述",
+  "hash": "022ea634b2"
  }
 ]
