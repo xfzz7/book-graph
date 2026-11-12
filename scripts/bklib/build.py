@@ -87,7 +87,7 @@ def merge(w: Work) -> dict:
         "critique": cr, "questions": qs, "quality": quality,
         "enums": {"kinds": S.KINDS, "rels": S.RELS, "voices": S.VOICES, "evTypes": S.EV_TYPES, "evStrength": S.EV_STRENGTH,
                   "critTypes": S.CRIT_TYPES, "qKinds": S.Q_KINDS, "priority": S.PRIORITY, "origin": S.CONCEPT_ORIGIN,
-                  "linkTypes": S.LINK_TYPES, "severity": S.SEVERITY},
+                  "linkTypes": S.LINK_TYPES, "severity": S.SEVERITY, "auditVerdicts": S.AUDIT_VERDICTS},
     }
 
 

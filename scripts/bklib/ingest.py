@@ -280,24 +280,32 @@ def read_pdf(path: str) -> dict:
 
 
 def _pdf_blocks(text: str) -> list[tuple[str, str]]:
+    """pdftotext 的输出通常丢了段间空行:用「行宽 + 句末标点」还原段落。
+    空行是硬分隔;明显偏短且没有句末标点的行(多半是标题)单独成块。"""
     lines = [l.rstrip() for l in text.split("\n")]
-    has_blank = sum(1 for l in lines if not l.strip()) >= max(3, len(lines) // 15)
-    if has_blank:
-        return _text_to_blocks("\n".join(lines))
-    # 无空行(常见于中文 PDF):按“行尾是句末标点且行明显短于最大行宽”判断段落结束
-    widths = sorted(len(l) for l in lines if l.strip())
+    widths = sorted(len(l.strip()) for l in lines if l.strip())
     mx = widths[int(len(widths) * 0.9)] if widths else 0
     blocks, cur = [], []
+
+    def flush():
+        if cur:
+            blocks.append(("p", _join_lines(cur)))
+            cur.clear()
+
+    end = re.compile(r"[。！？”」』.!?\"')]$")
     for l in lines:
         s = l.strip()
         if not s:
+            flush()
+            continue
+        if len(s) < mx * 0.6 and not end.search(s):
+            flush()
+            blocks.append(("p", s))
             continue
         cur.append(s)
-        if re.search(r"[。！？”」』.!?]$", s) and len(s) < mx * 0.85:
-            blocks.append(("p", _join_lines(cur)))
-            cur = []
-    if cur:
-        blocks.append(("p", _join_lines(cur)))
+        if end.search(s) and len(s) < mx * 0.85:
+            flush()
+    flush()
     return blocks
 
 
@@ -358,7 +366,7 @@ def split_chapters(src: dict, heading_regex: str | None = None, min_weight: int 
         if level is None and k == "p":
             hk = heading_kind(t)
             # 正文里的短行才当作标题;以句号结尾的不算
-            if hk and not re.search(r"[。.!?！？]$", t):
+            if hk and not (re.search(r"[。!?！？]$", t) or (len(t) > 40 and re.search(r"\.$", t))):
                 return hk
         return None
 
@@ -444,7 +452,10 @@ def split_chapters(src: dict, heading_regex: str | None = None, min_weight: int 
     book_title = re.sub(r"\W", "", src.get("title", ""))
     for c in chapters:
         w = sum(weight(t) for k, t in c["blocks"] if k == "p")
-        if w < min_weight and c["kind_hint"] != "part" and not RE_META.search(c["title"]):
+        if not any(k == "p" for k, _ in c["blocks"]) and (heading_kind(c["title"]) or c["kind_hint"] == "part"):
+            warns.append(f"「{c['title']}」没有正文,当作目录条目丢弃。")
+            continue
+        if w < min_weight and c["kind_hint"] != "part" and not RE_META.search(c["title"]) and heading_kind(c["title"]) is None:
             if book_title and re.sub(r"\W", "", c["title"]) == book_title:
                 warns.append("已丢弃书名页(只有书名/作者)。")
                 continue
@@ -459,6 +470,9 @@ def split_chapters(src: dict, heading_regex: str | None = None, min_weight: int 
             c["blocks"] = pre + c["blocks"]
             carry = []
         merged.append(c)
+    if not merged:  # 全是短章:别丢内容
+        merged = chapters
+        carry = []
     if carry and merged:
         for tt, bl in carry:
             merged[-1]["blocks"].append(("h2", tt))

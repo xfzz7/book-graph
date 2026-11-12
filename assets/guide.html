@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>阅读指南</title>
+<style>
+:root{--bg:#f5f1e8;--card:#fffdf8;--ink:#26231d;--muted:#7a7466;--line:#e3dccb;--accent:#a8432a;--blue:#3b5b73;--green:#5c7c4e;--amber:#9a6b12;--purple:#6d4f7a;--red:#b3392b;--soft:#efe9da}
+@media (prefers-color-scheme:dark){:root{--bg:#1d1b17;--card:#262320;--ink:#ece6d8;--muted:#a39b8a;--line:#3b362d;--accent:#e08a6c;--blue:#8db4d0;--green:#96bb86;--amber:#d9a94c;--purple:#b99bc7;--red:#e8786b;--soft:#2e2a24}}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.7 -apple-system,BlinkMacSystemFont,"PingFang SC","Noto Sans CJK SC","Microsoft YaHei",system-ui,sans-serif}
+header.top{position:sticky;top:0;z-index:5;background:var(--bg);border-bottom:1px solid var(--line)}
+.bar{max-width:980px;margin:0 auto;padding:10px 20px;display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.bar h1{font-size:17px;margin:0 8px 0 0;font-weight:700}
+nav.tabs{display:flex;gap:4px;flex-wrap:wrap;flex:1}
+nav.tabs button{border:1px solid transparent;background:none;color:var(--muted);padding:5px 12px;border-radius:999px;font:inherit;font-size:14px;cursor:pointer}
+nav.tabs button:hover{color:var(--ink)}
+nav.tabs button.on{background:var(--ink);color:var(--bg)}
+#q{border:1px solid var(--line);background:var(--card);color:var(--ink);padding:5px 12px;border-radius:999px;font:inherit;font-size:14px;width:180px}
+main{max-width:980px;margin:0 auto;padding:22px 20px 80px}
+section.view{display:none}
+section.view.on{display:block}
+h2{font-size:24px;margin:6px 0 4px}
+h3{font-size:17px;margin:26px 0 8px}
+.sub{color:var(--muted);margin:0 0 14px}
+.hero{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:22px 24px;margin-bottom:18px}
+.hero .big{font-size:21px;line-height:1.55;margin:4px 0 14px;font-weight:600}
+.kv{display:grid;grid-template-columns:96px 1fr;gap:6px 14px;margin:0}
+.kv dt{color:var(--muted);font-size:13px;padding-top:3px}
+.kv dd{margin:0}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 18px;margin:10px 0}
+.pill{display:inline-block;font-size:12px;line-height:1;padding:3px 8px;border-radius:999px;border:1px solid var(--line);color:var(--muted);margin-right:6px;white-space:nowrap;vertical-align:1px}
+.pill.must{background:var(--accent);color:#fff;border-color:var(--accent)}
+.pill.skim{background:var(--soft)}
+.pill.k-claim{color:var(--accent);border-color:var(--accent)}.pill.k-mechanism{color:var(--blue);border-color:var(--blue)}
+.pill.k-method{color:var(--green);border-color:var(--green)}.pill.k-evidence,.pill.k-example{color:var(--amber);border-color:var(--amber)}
+.pill.k-objection{color:var(--purple);border-color:var(--purple)}.pill.k-caveat{color:var(--red);border-color:var(--red)}.pill.k-aside{color:var(--muted);border-style:dashed}
+.pill.voice{background:var(--soft);color:var(--purple);border-color:var(--purple)}
+.pill.rev{background:var(--amber);color:#fff;border-color:var(--amber)}
+.pill.ok{color:var(--green);border-color:var(--green)}.pill.bad{color:var(--red);border-color:var(--red);background:transparent}
+.pill.ev-strong{color:var(--green);border-color:var(--green)}.pill.ev-moderate{color:var(--blue);border-color:var(--blue)}
+.pill.ev-weak{color:var(--red);border-color:var(--red)}.pill.ev-illustrative,.pill.ev-unclear{color:var(--muted)}
+.pill.outside{background:var(--soft);color:var(--purple);border:1px dashed var(--purple)}
+.pill.book{color:var(--green);border-color:var(--green)}
+.plan{display:flex;flex-wrap:wrap;gap:8px}
+.plan span{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:4px 10px;font-size:14px}
+.parts{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px}
+.parts .card{margin:0}
+.parts b{display:block;margin-bottom:2px}
+.pillar{border-left:4px solid var(--accent)}
+.pillar h4{margin:0 0 2px;font-size:16px}
+.mis{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:8px 0}
+.mis div{padding:10px 14px;border-radius:10px;font-size:15px}
+.mis .w{background:color-mix(in srgb,var(--red) 10%,var(--card));border:1px solid color-mix(in srgb,var(--red) 40%,var(--line))}
+.mis .r{background:color-mix(in srgb,var(--green) 10%,var(--card));border:1px solid color-mix(in srgb,var(--green) 40%,var(--line))}
+.mis small{display:block;color:var(--muted);font-size:12px;margin-bottom:2px}
+.chain{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin:6px 0}
+.chain .n{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:4px 10px;font-size:14px}
+.chain .a{color:var(--muted)}
+.tools{display:flex;gap:14px;align-items:center;flex-wrap:wrap;margin:8px 0 14px;font-size:14px;color:var(--muted)}
+.tools button{border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:999px;padding:4px 12px;font:inherit;font-size:13px;cursor:pointer}
+.tree,.tree ul{list-style:none;margin:0;padding:0}
+.tree ul{margin-left:18px;border-left:2px solid var(--line);padding-left:14px}
+.node{margin:8px 0}
+.nbody{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px 14px}
+.node.t1>.nbody{border-left:4px solid var(--accent)}
+.node.t3>.nbody{opacity:.88}
+.nhead{display:flex;gap:6px;align-items:baseline;flex-wrap:wrap}
+.nhead b{font-size:15px}
+.tg{cursor:pointer;color:var(--muted);user-select:none;width:16px;display:inline-block}
+.ntext{margin:3px 0 4px}
+.loc{font-size:12.5px;color:var(--muted)}
+.loc code{background:var(--soft);padding:1px 6px;border-radius:5px;font-size:12.5px;cursor:pointer}
+.node.collapsed>ul{display:none}
+body:not(.show3) .node.t3{display:none}
+.hide{display:none!important}
+.evbox{font-size:13.5px;color:var(--muted);margin-top:4px}
+details.chap{background:var(--card);border:1px solid var(--line);border-radius:12px;margin:10px 0;padding:0}
+details.chap>summary{cursor:pointer;padding:14px 18px;list-style:none;display:flex;gap:10px;align-items:baseline;flex-wrap:wrap}
+details.chap>summary::-webkit-details-marker{display:none}
+details.chap>summary b{font-size:17px}
+details.chap .in{padding:0 18px 16px}
+.rq{margin:6px 0 6px 18px;padding:0}
+.take{background:var(--soft);border-radius:8px;padding:8px 12px;margin:8px 0}
+table{border-collapse:collapse;width:100%;font-size:14px;background:var(--card);border:1px solid var(--line)}
+th,td{padding:8px 10px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+th{background:var(--soft);font-weight:600}
+.crit{border-left:4px solid var(--line)}
+.crit.high{border-left-color:var(--red)}.crit.med{border-left-color:var(--amber)}.crit.strength{border-left-color:var(--green)}
+.crit.outside{background:color-mix(in srgb,var(--purple) 6%,var(--card));border-style:dashed}
+.q .qtext{font-size:16px;margin:4px 0 8px}
+.q .ans{display:none;background:var(--soft);border-radius:8px;padding:10px 14px;margin-top:6px}
+.q.open .ans{display:block}
+.q button{border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:999px;padding:4px 14px;font:inherit;font-size:13px;cursor:pointer;margin-right:6px}
+.q.got{border-left:4px solid var(--green)}.q.again{border-left:4px solid var(--red)}
+.prog{height:6px;background:var(--soft);border-radius:4px;overflow:hidden;margin:6px 0 12px}
+.prog i{display:block;height:100%;background:var(--green);width:0}
+.stat{display:inline-block;margin:0 22px 8px 0}.stat b{font-size:24px;display:block;line-height:1.1}.stat span{font-size:12.5px;color:var(--muted)}
+.note{font-size:13.5px;color:var(--muted)}
+footer{max-width:980px;margin:0 auto;padding:0 20px 40px;color:var(--muted);font-size:13px}
+@media (max-width:640px){.mis{grid-template-columns:1fr}.kv{grid-template-columns:1fr}.kv dt{padding:0}#q{width:100%}}
+@media print{header.top,.tools,.q button{display:none}section.view{display:block!important;page-break-before:always}section.view:first-of-type{page-break-before:auto}body.show3 .node.t3,.node.t3{display:block!important}.node.collapsed>ul{display:block!important}.q .ans{display:block!important}details.chap{break-inside:avoid}details.chap:not([open])>.in{display:block}}
+</style>
+</head>
+<body>
+<header class="top"><div class="bar"><h1 id="ttl"></h1><nav class="tabs" id="tabs"></nav><input id="q" type="search" placeholder="搜索这份指南…"></div></header>
+<main id="main"></main>
+<footer id="foot"></footer>
+<script>
+const BOOK=/*DATA*/null/*END*/;
+(function(){
+"use strict";
+const B=BOOK,E=B.enums,C=B.cards,Q=B.quality||{};
+const esc=s=>String(s==null?"":s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const chOrder={};B.chapters.forEach((c,i)=>chOrder[c.key]=i);
+const chTitle={};B.chapters.forEach(c=>chTitle[c.key]=c.title);
+const kids={};Object.values(C).forEach(c=>{if(c.parent){(kids[c.parent]=kids[c.parent]||[]).push(c.id)}});
+const num=id=>parseInt(String(id).split(".k")[1]||0,10);
+const cmp=(a,b)=>(chOrder[C[a].ch]-chOrder[C[b].ch])||(num(a)-num(b));
+Object.values(kids).forEach(a=>a.sort(cmp));
+const att={};Object.entries(B.attach||{}).forEach(([cid,pid])=>(att[pid]=att[pid]||[]).push(cid));
+Object.values(att).forEach(a=>a.sort(cmp));
+const lsKey="bk:"+B.meta.title;
+let prog={};try{prog=JSON.parse(localStorage.getItem(lsKey)||"{}")}catch(e){}
+const save=()=>{try{localStorage.setItem(lsKey,JSON.stringify(prog))}catch(e){}};
+const pill=(t,cls)=>`<span class="pill ${cls||""}">${esc(t)}</span>`;
+const loc=c=>{const l=c.loc;return `<div class="loc">📍 ${esc(l.chTitle)}${l.sec?" › "+esc(l.sec):""} · 约 ${l.pos}% · 检索 <code title="点击复制" data-copy="${esc(l.anchor)}">${esc(l.anchor)}</code></div>`};
+const cardRef=id=>C[id]?`<a href="#" data-goto="${esc(id)}">${esc(C[id].label)}</a>`:esc(id);
+
+/* ---------- 1 一页读懂 ---------- */
+function vOverview(){
+  const b=B.brief,rp=b.readingPlan||{};
+  let h=`<div class="hero"><div class="big">${esc(b.one_liner)}</div><dl class="kv">
+  <dt>它在回答</dt><dd>${esc(b.question)}</dd><dt>它的答案</dt><dd>${esc(b.thesis)}</dd><dt>适合谁</dt><dd>${esc(b.audience)}</dd></dl></div>`;
+  h+=`<h3>怎么读</h3>`;
+  if(rp.why)h+=`<p class="sub">${esc(rp.why)}</p>`;
+  const lab={must:"精读",skim:"略读",skip:"可跳过"};
+  h+=`<div class="plan">`+["must","skim","skip"].map(f=>(rp[f]||[]).map(k=>`<span>${pill(lab[f],f==="must"?"must":f==="skim"?"skim":"")}${esc(chTitle[k]||k)}</span>`).join("")).join("")+`</div>`;
+  if((b.parts||[]).length){h+=`<h3>全书结构</h3><div class="parts">`+b.parts.map(p=>`<div class="card"><b>${esc(p.title)}</b><span class="note">${(p.chapters||[]).map(k=>esc(chTitle[k]||k)).join(" · ")}</span><div>${esc(p.job)}</div></div>`).join("")+`</div>`}
+  h+=`<h3>支撑全书主张的几根支柱</h3>`+(B.pillars||[]).map(p=>`<div class="card pillar"><h4>${esc(p.id)} · ${esc(p.label)}</h4>${esc(p.text)} <a href="#" data-pillar="${esc(p.id)}">看论证 →</a></div>`).join("");
+  if((b.misreadings||[]).length){h+=`<h3>容易读错的地方</h3>`+b.misreadings.map(m=>`<div class="mis"><div class="w"><small>✗ 容易被读成</small>${esc(m.wrong)}</div><div class="r"><small>✓ 书里实际是</small>${esc(m.right)}</div></div>`).join("")}
+  if((B.chains||[]).length){h+=`<h3>因果链与回路</h3>`+B.chains.map(c=>`<div class="card"><b>${esc(c.name)}</b>${c.note?` <span class="note">${esc(c.note)}</span>`:""}<div class="chain">`+c.steps.map((s,i)=>`<span class="n">${cardRef(s)}</span>${i<c.steps.length-1?'<span class="a">→</span>':""}`).join("")+(c.loop?`<span class="a">↺ 回到开头</span>`:"")+`</div></div>`).join("")}
+  const rev=Object.values(C).filter(c=>c.rel==="revises"&&C[c.parent]);
+  const ten=(B.links||[]).filter(l=>(l.type==="revises"||l.type==="tension")&&C[l.from]&&C[l.to]);
+  if(rev.length||ten.length){h+=`<h3>书里的自我修正与张力</h3><p class="sub">作者在后文改了前文的说法,或前后有拉扯——读的时候要以修正后的为准。</p>`;
+    h+=rev.map(c=>`<div class="card"><span class="pill rev">修正</span><b>${cardRef(c.parent)}</b> → <b>${cardRef(c.id)}</b><div class="ntext">${esc(c.text)}</div>${loc(c)}</div>`).join("");
+    h+=ten.map(l=>`<div class="card"><span class="pill rev">${esc(E.linkTypes[l.type])}</span><b>${cardRef(l.from)}</b> ⇄ <b>${cardRef(l.to)}</b><div class="ntext">${esc(l.note)}</div></div>`).join("")}
+  return h}
+
+/* ---------- 2 论证地图 ---------- */
+function nodeHtml(id,depth){
+  const c=C[id],ks=(kids[id]||[]);
+  const ev=c.ev?`<div class="evbox">${pill("证据·"+E.evTypes[c.ev.type])}${pill("强度 "+E.evStrength[c.ev.strength],"ev-"+c.ev.strength)}局限:${esc(c.ev.limit)}</div>`:"";
+  const au=c.audit?(c.audit==="ok"?pill("✓已核对","ok"):pill("⚠核对:"+(E.auditVerdicts?E.auditVerdicts[c.audit]:c.audit),"bad")):"";
+  const rv=ks.some(k=>C[k].rel==="revises")?pill("后文有修正","rev"):"";
+  const open=depth<1?"":" collapsed";
+  return `<li class="node t${c.tier}${ks.length?open:""}" id="n-${esc(id)}" data-id="${esc(id)}"><div class="nbody item" data-text="${esc(c.label+" "+c.text)}">
+  <div class="nhead">${ks.length?'<span class="tg">▸</span>':'<span class="tg"></span>'}${c.rel?pill(E.rels[c.rel],c.rel==="revises"?"rev":""):""}${pill(E.kinds[c.kind],"k-"+c.kind)}${c.voice!=="author"?pill(E.voices[c.voice],"voice"):""}<b>${esc(c.label)}</b>${rv}${au}</div>
+  <div class="ntext">${esc(c.text)}</div>${ev}${loc(c)}</div>${ks.length?"<ul>"+ks.map(k=>nodeHtml(k,depth+1)).join("")+"</ul>":""}</li>`}
+function vMap(){
+  let h=`<h2>论证地图</h2><p class="sub">从全书主张到支柱,再到各章的论断、机制、证据。左侧粗线=承重(tier 1)。点 ▸ 展开子论证;“📍”给出章节位置和一个可在书里 Ctrl+F 的检索短语。</p>
+  <div class="tools"><label><input type="checkbox" id="chk3"> 显示细节(tier 3)</label><label><input type="checkbox" id="chkq"> 只看有疑问的(弱证据/核对未过)</label><button id="expAll">全部展开</button><button id="colAll">全部收起</button></div>
+  <div class="card pillar" style="border-left-color:var(--ink)"><b>全书主张</b><div class="ntext">${esc(B.brief.thesis)}</div></div><ul class="tree">`;
+  (B.pillars||[]).forEach(p=>{h+=`<li class="node" id="p-${esc(p.id)}"><div class="nbody pillar item" data-text="${esc(p.label+" "+p.text)}"><div class="nhead"><span class="tg">▾</span>${pill(p.id)}<b>${esc(p.label)}</b></div><div class="ntext">${esc(p.text)}</div></div><ul>`+(att[p.id]||[]).map(id=>nodeHtml(id,1)).join("")+`</ul></li>`});
+  return h+"</ul>"}
+
+/* ---------- 3 章节导读 ---------- */
+function vChapters(){
+  let h=`<h2>章节导读</h2><p class="sub">每章:它在全书里的作用、读前问题、内容、一句话带走,以及承重的论点。</p>`,part=null;
+  B.chapters.forEach(c=>{
+    if(c.part&&c.part!==part){part=c.part;h+=`<h3>${esc(part)}</h3>`}
+    const t1=c.cards.filter(i=>C[i]&&C[i].tier===1);
+    h+=`<details class="chap item" data-text="${esc(c.title+" "+c.role+" "+c.summary+" "+c.takeaway)}" ${c.priority==="must"?"open":""}><summary>${pill(E.priority[c.priority],c.priority)}<b>${esc(c.title)}</b><span class="note">${esc(c.takeaway)}</span></summary><div class="in">
+    <p><b>在全书里的作用</b>:${esc(c.role)}</p><p><b>读之前想想</b></p><ol class="rq">${c.readingQuestions.map(q=>`<li>${esc(q)}</li>`).join("")}</ol>
+    <p><b>内容</b>:${esc(c.summary)}</p><div class="take">一句话带走:${esc(c.takeaway)}</div>
+    ${t1.length?`<p><b>承重的论点</b></p><ul>${t1.map(i=>`<li>${cardRef(i)}:${esc(C[i].text)}</li>`).join("")}</ul>`:""}</div></details>`});
+  return h}
+
+/* ---------- 4 概念 ---------- */
+function vConcepts(){
+  let h=`<h2>概念表</h2><p class="sub">作者自造或赋予特殊含义的词,以及他刻意区分的近义词。读错概念是误解的第一来源。</p>`;
+  (B.concepts||[]).forEach(k=>{h+=`<div class="card item" data-text="${esc(k.term+" "+k.def+" "+(k.not||""))}"><b style="font-size:17px">${esc(k.term)}</b> ${pill(E.origin[k.origin])}<div class="ntext">${esc(k.def)}</div>${k.not?`<div class="note">区分:${esc(k.not)}</div>`:""}${k.loc?`<div class="loc">📍 ${esc(k.loc.chTitle)}${k.loc.sec?" › "+esc(k.loc.sec):""} · 约 ${k.loc.pos}%</div>`:""}</div>`});
+  return h||"<p>没有概念。</p>"}
+
+/* ---------- 5 审读 ---------- */
+function vReview(){
+  const cr=B.critique||{};
+  let h=`<h2>审读:该信多少</h2><div class="hero"><div class="ntext">${esc(cr.verdict)}</div></div>`;
+  h+=`<p class="note">标签说明:${pill("书中自述","book")}书里自己承认、或可直接在书中查到;${pill("外部判断·需自行核实","outside")}是写这份指南的 AI 的判断,不在书里,请自行核实。</p>`;
+  if((cr.strengths||[]).length)h+=`<h3>站得住的部分</h3><ul>${cr.strengths.map(s=>`<li>${esc(s)}</li>`).join("")}</ul>`;
+  const order={high:0,med:1,low:2};
+  h+=`<h3>需要打折的地方</h3>`+(cr.items||[]).filter(i=>i.type!=="strength").sort((a,b)=>order[a.severity]-order[b.severity]).map(i=>`<div class="card crit ${i.severity} ${i.source} item" data-text="${esc(i.text)}">${pill(E.critTypes[i.type])}${pill("严重度 "+E.severity[i.severity])}${i.source==="book"?pill("书中自述","book"):pill("外部判断·需自行核实","outside")}<div class="ntext">${esc(i.text)}</div><div class="note">涉及:${i.target.map(cardRef).join("、")}</div></div>`).join("");
+  const sts=(cr.items||[]).filter(i=>i.type==="strength");
+  if(sts.length)h+=`<h3>补充:站得住的部分</h3>`+sts.map(i=>`<div class="card crit strength item" data-text="${esc(i.text)}">${esc(i.text)}</div>`).join("");
+  const evs=Object.values(C).filter(c=>c.ev).sort((a,b)=>cmp(a.id,b.id));
+  if(evs.length)h+=`<h3>证据账本</h3><p class="sub">强度只依据书里交代的方法与作者自己的话评定。</p><table><tr><th>证据</th><th>类型</th><th>强度</th><th>局限</th><th>位置</th></tr>${evs.map(c=>`<tr class="item" data-text="${esc(c.label+" "+c.ev.limit)}"><td>${cardRef(c.id)}</td><td>${esc(E.evTypes[c.ev.type])}</td><td>${pill(E.evStrength[c.ev.strength],"ev-"+c.ev.strength)}</td><td>${esc(c.ev.limit)}</td><td class="note">${esc(c.loc.chTitle)}</td></tr>`).join("")}</table>`;
+  return h}
+
+/* ---------- 6 自测 ---------- */
+function vQuiz(){
+  const qs=B.questions||[];
+  let h=`<h2>自测</h2><p class="sub">先盖住答案自己作答,再点“看答案”,诚实标记。标记保存在你的浏览器里。</p><div class="prog"><i id="pbar"></i></div>
+  <div class="tools"><span id="ptxt"></span><label><input type="checkbox" id="onlyAgain"> 只看没掌握/未做的</label><button id="showAll">全部显示答案</button><span class="note">题型:${Object.keys(E.qKinds).map(k=>E.qKinds[k]).join(" / ")}</span></div>`;
+  qs.forEach((q,i)=>{const st=prog[q.id]||"";h+=`<div class="card q item ${st==="got"?"got":st==="again"?"again":""}" data-qid="${esc(q.id)}" data-text="${esc(q.q+" "+q.a)}">${pill(E.qKinds[q.kind])}<span class="note">${i+1}/${qs.length}</span><div class="qtext">${esc(q.q)}</div>
+  <button class="rev">看答案</button><button class="got">✓ 掌握了</button><button class="again">✗ 再看看</button>
+  <div class="ans">${esc(q.a)}<div class="loc">${(q.cards||[]).filter(c=>C[c]).slice(0,2).map(c=>`出处:${esc(C[c].loc.chTitle)}${C[c].loc.sec?" › "+esc(C[c].loc.sec):""} · 检索「${esc(C[c].loc.anchor)}」`).join("<br>")}</div></div></div>`});
+  return h}
+
+/* ---------- 7 行动 ---------- */
+function vActions(){
+  const ms=Object.values(C).filter(c=>c.kind==="method").sort((a,b)=>cmp(a.id,b.id));
+  if(!ms.length)return null;
+  let h=`<h2>行动清单</h2><p class="sub">书里可以照着做的方法,连同适用条件与注意事项。</p>`;
+  ms.forEach(m=>{const ks=(kids[m.id]||[]).map(k=>C[k]);
+    h+=`<div class="card item" data-text="${esc(m.label+" "+m.text)}"><b>${esc(m.label)}</b> ${pill(E.kinds[m.kind],"k-method")}<div class="ntext">${esc(m.text)}</div>${ks.length?`<ul>${ks.map(k=>`<li>${pill(E.rels[k.rel]||"")}${esc(k.text)}</li>`).join("")}</ul>`:""}${loc(m)}</div>`});
+  return h}
+
+/* ---------- 8 可靠性 ---------- */
+function vQuality(){
+  const s=Q.seeds||{};
+  let h=`<h2>这份指南有多可靠</h2><p class="sub">每张卡片都钉在原文段落上;下面是自动与独立核对的结果。</p>
+  <div class="card"><span class="stat"><b>${Q.cards}</b><span>卡片</span></span><span class="stat"><b>${Q.audited}</b><span>项经独立核对</span></span><span class="stat"><b>${Q.audited?Math.round(100*Q.auditOk/Q.audited)+"%":"—"}</b><span>首轮/当前通过率</span></span>${s.total?`<span class="stat"><b>${s.caught}/${s.total}</b><span>核对者识别出的“故意写坏”条目</span></span>`:""}<span class="stat"><b>${Q.waived}</b><span>被豁免警告的卡片</span></span><span class="stat"><b>${Q.outside}</b><span>审读里的外部判断</span></span></div>
+  <h3>怎么做到的</h3><ul><li>每张卡片有原文段落引用和一个逐字的检索短语;脚本核对该短语确实出现在被引段落里。</li><li>卡片中的数字必须出现在被引段落附近;命题与原文用词重合率、与原文连续相同字符数(防照抄)都有检查。</li><li>独立核对者只拿到“条目 + 原文段落”,按“忠实/说过头/走样/找不到/归因错误/太空泛”判断,批次里混有故意写坏的条目来衡量核对者是否认真。</li><li>本指南不含书中的大段原文;检索短语总共 ${Q.anchorChars} 字,约占全书 ${(100*Q.anchorChars/Math.max(1,Q.sourceWeight)).toFixed(1)}%。</li></ul>
+  <h3>已知局限</h3><ul><li>卡片的“承重程度”、论证树的结构、审读判断是 AI 的重构,不是作者的原话;与书不一致时以书为准。</li><li>核对是抽样,不是全量。</li></ul><p class="note">生成日期 ${esc(Q.date||"")} · 来源文件 ${esc(B.meta.sourceFile||"")}</p>`;
+  return h}
+
+/* ---------- 装配 ---------- */
+const views=[["overview","一页读懂",vOverview],["map","论证地图",vMap],["chapters","章节导读",vChapters],["concepts","概念",vConcepts],["review","审读",vReview],["quiz","自测",vQuiz],["actions","行动",vActions],["quality","可靠性",vQuality]];
+document.getElementById("ttl").textContent=B.meta.title;
+const main=document.getElementById("main"),tabs=document.getElementById("tabs");
+const shown=[];
+views.forEach(([id,name,fn])=>{const h=fn();if(h==null)return;shown.push(id);
+  const s=document.createElement("section");s.className="view";s.id="v-"+id;
+  s.innerHTML=(id==="overview"?`<h2>${esc(B.meta.title)}</h2><p class="sub">${esc(B.meta.author||"")}${B.meta.genre?" · "+esc(B.meta.genre):""}</p>`:"")+h;main.appendChild(s);
+  const b=document.createElement("button");b.textContent=name;b.dataset.v=id;tabs.appendChild(b)});
+document.getElementById("foot").textContent="本指南由 AI 依据原书生成,不含书中大段原文;请把它当作读书的辅助,而不是替代。";
+function show(id,focus){if(!shown.includes(id))id="overview";
+  document.querySelectorAll("section.view").forEach(s=>s.classList.toggle("on",s.id==="v-"+id));
+  tabs.querySelectorAll("button").forEach(b=>b.classList.toggle("on",b.dataset.v===id));
+  if(location.hash.slice(1)!==id&&!focus)history.replaceState(null,"","#"+id);
+  if(focus){const el=document.getElementById(focus);if(el){let p=el.parentElement;while(p){if(p.classList&&p.classList.contains("collapsed"))p.classList.remove("collapsed");p=p.parentElement}
+    el.scrollIntoView({block:"center"});const bd=el.querySelector(".nbody");if(bd){bd.style.outline="2px solid var(--accent)";setTimeout(()=>bd.style.outline="",2200)}}}else window.scrollTo(0,0)}
+tabs.addEventListener("click",e=>{if(e.target.dataset.v)show(e.target.dataset.v)});
+document.addEventListener("click",e=>{
+  const t=e.target;
+  if(t.dataset&&t.dataset.copy){navigator.clipboard&&navigator.clipboard.writeText(t.dataset.copy).then(()=>{const o=t.textContent;t.textContent="已复制";setTimeout(()=>t.textContent=o,900)});return}
+  if(t.dataset&&t.dataset.goto){e.preventDefault();show("map",null);setTimeout(()=>show("map","n-"+t.dataset.goto),0);return}
+  if(t.dataset&&t.dataset.pillar){e.preventDefault();show("map");setTimeout(()=>{const el=document.getElementById("p-"+t.dataset.pillar);el&&el.scrollIntoView({block:"start"})},0);return}
+  if(t.classList&&t.classList.contains("tg")){const n=t.closest(".node");if(n)n.classList.toggle("collapsed");return}
+  const q=t.closest&&t.closest(".q");
+  if(q&&t.tagName==="BUTTON"){const id=q.dataset.qid;
+    if(t.classList.contains("rev"))q.classList.toggle("open");
+    else{const v=t.classList.contains("got")?"got":"again";prog[id]=v;save();q.classList.remove("got","again");q.classList.add(v);q.classList.add("open");updProg()}}
+});
+function updProg(){const qs=B.questions||[];const g=qs.filter(q=>prog[q.id]==="got").length,a=qs.filter(q=>prog[q.id]==="again").length;
+  const p=document.getElementById("pbar"),t=document.getElementById("ptxt");if(p)p.style.width=(qs.length?100*g/qs.length:0)+"%";if(t)t.textContent=`掌握 ${g} · 待复习 ${a} · 未做 ${qs.length-g-a}`;
+  if(document.getElementById("onlyAgain")&&document.getElementById("onlyAgain").checked)document.querySelectorAll(".q").forEach(x=>x.classList.toggle("hide",prog[x.dataset.qid]==="got"))}
+function bind(id,fn){const el=document.getElementById(id);el&&el.addEventListener("change",fn)}
+bind("chk3",e=>document.body.classList.toggle("show3",e.target.checked));
+bind("onlyAgain",()=>{document.querySelectorAll(".q").forEach(x=>x.classList.toggle("hide",document.getElementById("onlyAgain").checked&&prog[x.dataset.qid]==="got"))});
+bind("chkq",e=>{const on=e.target.checked;document.querySelectorAll("#v-map li.node[data-id]").forEach(n=>{const c=C[n.dataset.id];const bad=(c.ev&&(c.ev.strength==="weak"||c.ev.strength==="unclear"))||(c.audit&&c.audit!=="ok");n.dataset.bad=bad?"1":"0"});
+  document.querySelectorAll("#v-map li.node[data-id]").forEach(n=>{n.classList.toggle("hide",on&&!(n.dataset.bad==="1"||n.querySelector('[data-bad="1"]')))})});
+document.getElementById("expAll")&&document.getElementById("expAll").addEventListener("click",()=>document.querySelectorAll("#v-map .node").forEach(n=>n.classList.remove("collapsed")));
+document.getElementById("colAll")&&document.getElementById("colAll").addEventListener("click",()=>document.querySelectorAll("#v-map .node[data-id]").forEach(n=>{if(n.querySelector("ul"))n.classList.add("collapsed")}));
+document.getElementById("showAll")&&document.getElementById("showAll").addEventListener("click",()=>document.querySelectorAll(".q").forEach(q=>q.classList.add("open")));
+document.getElementById("q").addEventListener("input",e=>{
+  const v=e.target.value.trim().toLowerCase();
+  const items=[...document.querySelectorAll(".item")];
+  items.forEach(x=>x.classList.remove("hide"));
+  if(!v)return;
+  const hit=new Set(items.filter(x=>(x.dataset.text||"").toLowerCase().includes(v)));
+  items.forEach(x=>{
+    const holder=x.closest("li.node");
+    const desc=holder?[...holder.querySelectorAll(".item")].some(y=>hit.has(y)):false;
+    const keep=hit.has(x)||desc;
+    x.classList.toggle("hide",!keep);
+    if(holder&&keep){for(let p=holder;p;p=p.parentElement)if(p.classList&&p.classList.contains("collapsed"))p.classList.remove("collapsed")}
+  });
+  const cur=document.querySelector("section.view.on");
+  if(cur&&(cur.id==="v-overview"||cur.id==="v-quality"))show("map");
+});
+updProg();
+show(location.hash.slice(1)||"overview");
+window.addEventListener("hashchange",()=>show(location.hash.slice(1)));
+})();
+</script>
+</body>
+</html>
