@@ -1,200 +1,122 @@
 ---
-name: nonfiction-book-graph
-description: 把一本非虚构书(epub/pdf/txt)拆成句子级命题与有向关系,产出「总览导图」和「关系网」两个自包含 HTML,并给出图论报告。当用户要做读书笔记导图、书籍知识图谱、概念关系图、论证链分析时使用。自带 EPUB 分章、JSON 校验与离线渲染脚本,不需要 API key。
+name: nonfiction-book-companion
+description: 把一本非虚构书(epub/pdf/txt/md)做成"伴读指南"——一页读懂、论证地图、章节导读、概念表、审读(证据强弱与局限)、自测题与记忆卡片,每一条都能回到原文核对。用户想读懂/总结/拆解论证/做读书笔记、导图、知识图谱、思维导图一本书时使用。不适合虚构类。自带切章、校验、溯源核对与离线渲染脚本,只需 Python ≥3.9,不需要 API key 或联网。
 ---
 
-# 非虚构书 → 总览导图 + 关系网
+# 非虚构书伴读指南
 
-你(LLM)负责读书和标注,脚本负责校验、算图、出页面。两边只通过一个 `book.json` 交接,所以**不需要任何 API key,也不需要联网**。
+**目标不是"产出一份看起来丰富的笔记",而是让读者真的更懂这本书。** 所以这套流程围绕四件事设计:
 
-- **总览导图**回答「这本书怎么讲」:篇 → 章 → 要点,按作者顺序,无交叉连线。
-- **关系网**回答「书里的说法怎么互相作用」:命题为节点,有向、带类型、可查路径。
+1. **抓承重的东西**:论证里拿掉就垮的论点、证据、概念、作者的自我修正——不是逐句摘要。
+2. **每一条都能核对**:每张卡片钉在原文段落上,带一个能 Ctrl+F 的检索短语;脚本核对数字、用词重合与照抄,再由独立核对者抽查。
+3. **分清谁在说、说到什么程度**:作者主张 / 他人观点 / 作者存疑;证据强弱;"书里说的"与"我的判断"分开标。
+4. **检验理解而不是展示内容**:自测题含解释、应用、辨析、易错题,并导出记忆卡片。
 
-两者不重复:大纲不要复述关系,关系不要复述章节顺序。
+你(LLM)负责读书与判断;脚本 `scripts/bk.py` 负责切章编号、分块、校验、抽样核对、渲染。所有中间状态都在 `work/` 的文件里——上下文被压缩、被换人接手时,运行 `python scripts/bk.py status -w work` 就能知道做到哪、下一步做什么。
 
-## 0. 依赖与边界
+## 铁律
 
-| 项 | 说明 |
+1. **一律转述。** 交付物里不放大段原文;校验会拦截连续 16 个汉字(约 8 个英文词)的照抄。允许的唯一原文是每张卡一个很短的 `anchor`(检索短语)。原文与 `work/source/` 只是临时工作文件,**不得提交、不得交付**。
+2. **不编造。** 每张卡必须有 `refs`(原文段落 id)和逐字摘自原文的 `anchor`;数字必须出现在引用段落里。拿不准就回原文看(`bk find`),不要凭记忆补。
+3. **保留限定语。** 作者说"大致/经验法则/没有统计检验",卡片里就要有。把"可能"写成"是",就是失真。
+4. **voice 要标对。** 作者批评的流行观点、转述的别人的话,是 `other`,不是作者主张。
+5. **"书里说的"与"我的判断"分开。** 审读里 `source=book` 要有 refs;你的外部判断一律标 `outside`,并且克制。
+6. **不靠感觉下结论。** "写完了"以 `bk check` 与独立核对的结果为准,不以自己觉得好为准。
+7. **输出语言跟随用户**(用户说中文就写中文),但 `anchor` 必须保持原文语言。
+
+## 环境
+
+```bash
+python scripts/bk.py --help            # 以下简写为 bk;-w 指定工作目录(默认 work)
+```
+只用标准库。PDF 需要系统有 `pdftotext`(没有就让用户先转成 epub/txt)。输出目录建议一本书一个(`dist/<书名>/`)。
+
+## 流程
+
+### 0. 摄入与定向
+```bash
+bk ingest 书.epub -w work         # 切章、给每个段落编号(c03:12);打印章列表与警告
+bk skeleton -w work               # 全书骨架:每章标题/规模/小节/开头结尾
+```
+- **先核对章列表**是否与书的目录一致。常见问题:整本压成一个 HTML(用 `--heading-regex` 指定标题正则重跑)、版权页/索引被当成正文(`bk skip c01`)、章被合并/拆碎。切错了后面全错。
+- 然后按 [references/prompts/00_orient.md](references/prompts/00_orient.md) 写 `work/orient.json`:这本书要回答什么问题、你对主张的**假设**、容易读错的地方。
+- 版权:原文只在 `work/source/`;不要复制进仓库或交付物。
+
+### 1. 逐章读、写章笔记(核心)
+对每个待读章(`bk status` 会列出),**严格按** [references/prompts/01_read_chapter.md](references/prompts/01_read_chapter.md):
+```bash
+bk brief c03 -w work              # 章前简报:全书定向 + 前面各章要点 + 已有术语 + 下一个可用 id
+bk read c03 1 -w work             # 读第 1 块(长章会分块:bk read c03 2 …)
+# 写 work/notes/c03.json
+bk check c03 -w work              # 立刻校验,按提示修,最多 3 轮
+```
+- 有子代理能力时,各章**可以并行**(每个子代理各做若干章,各自 `brief → read → 写 → check`;orient.json 先写好)。没有就顺序做。两种做法产物格式相同。
+- 不要整本塞进上下文。每章只带"简报 + 本章文本"。
+- 章的作用、主论点、证据、作者自我修正,比"摘要全面"重要得多。
+
+### 2. 全书综合
+按 [02_synthesize.md](references/prompts/02_synthesize.md):`bk digest -w work` → 写 `work/synthesis.json`(全书主张、支柱、各章顶层卡挂到支柱、因果链、概念表、**易误读清单**、读法)。
+
+### 3. 审读
+按 [03_critique.md](references/prompts/03_critique.md) 写 `work/critique.json`:证据强弱、论证缺口、替代解释、适用边界。书里自己承认的与你的外部判断**分开标**。
+
+### 4. 自测题
+按 [04_questions.md](references/prompts/04_questions.md) 写 `work/questions.json`:回忆题不超过 40%,要有解释/应用/辨析/易错题。
+
+### 5. 校验与独立核对(必须做)
+```bash
+bk check --full -w work            # 0 个错误才能继续;警告要修或在卡上显式 waive(会被重点审计)
+bk audit-plan -w work              # 抽样 + 混入故意写坏的“种子”条目 → audit/batch_NN.md
+# 让一位独立的核对者(新会话/子代理;不要用刚写笔记的同一上下文)按 05_audit.md 写 audit/verdicts_NN.json
+bk audit-apply -w work             # 汇总;显示核对者识别出了几个种子故障
+```
+- 核对不通过的条目:回原文修正 → `bk audit-plan --retry` 重审,直到没有未解决项。
+- **种子识别率低于 60%** 说明这轮核对没认真,换核对者或加大 `--rate` 再来一轮。
+- 没有独立的核对者可用时,自己核对也行,但要在交付说明里如实写“未独立核对”。
+
+### 6. 出图与交付
+```bash
+bk build -w work -o dist/<书名>   # 校验无错误才会出图
+```
+产出(都自包含、离线可看):
+- `《书名》_阅读指南.html`——主交付:一页读懂 / 论证地图 / 章节导读 / 概念 / 审读 / 自测 / 行动 / 可靠性;
+- `《书名》_阅读指南.md`——同内容的 Markdown,可粘进 Obsidian/Notion;
+- `《书名》_记忆卡片.tsv`——Anki 可直接导入(制表符分隔,正面/背面/标签)。
+
+**交付时告诉用户**(几句话即可):怎么读它(见下)、核对的结果(通过率、种子识别率、校验遗留的警告)、哪些地方是外部判断、已知局限(例如某章读得粗、PDF 版面还原不确定)。
+
+## 读者怎么用这份指南
+
+- **读之前**:看"一页读懂"和"易误读清单"建立地图;翻"章节导读"里每章的"读前问题",带着问题去读;按"怎么读"决定精读/略读哪些章。
+- **读的时候**:每读完一章,回到该章导读,核对自己的理解;不确定处点开论证地图的卡片,用"检索短语"在书里搜回原文。
+- **读完之后**:做"自测"(盖住答案先作答,标记掌握情况),看"审读"决定该信多少,用"记忆卡片"做间隔复习。
+- 指南是**读书的辅助,不是读书的替代**:它告诉你书的论证长什么样、哪里承重、哪里要打折;细节与语气仍要回到书里。
+
+## 追问与迭代
+用户事后追问书里的内容:先 `bk find "关键词"` 回原文,再答;答案里的每个事实都要能指到段落。发现笔记有误:改对应的 `notes/*.json` → `bk check` → `bk audit-plan --retry` → `bk build`。**只改 `work/` 里的 JSON,不要手改生成的 HTML。**
+
+## 常见问题
+
+| 现象 | 处理 |
 |---|---|
-| Python | ≥ 3.10 |
-| 校验 / 分章 | 只用标准库 |
-| 出图 / 报告 | 需要 `networkx`(`pip install networkx`) |
-| 不需要 | 任何模型 API、密钥、网络、前端构建 |
-| 不做 | 虚构类(人物/时间线/防剧透);PDF 请先转成 txt/epub |
+| 只切出 1 章/章名全是"第 N 段(自动切分)" | 没识别出标题。看原书目录,写标题正则:`bk ingest 书 --heading-regex '^第.{1,4}章'` |
+| `anchor 在原文里找不到` | 你写错或编造了。回 `bk read` 的输出里**复制**一小段,别凭记忆写 |
+| `用词重合率只有 0.2x` | refs 引错段落,或卡片说多了。用 `bk find` 找对的段落 |
+| `数字 [...] 没有出现在引用段落` | 数字抄错/编造,或是你推算的(推算的写明“约/折合”并 waive numbers) |
+| `疑似照抄` | 换成自己的话;只是书里的专有名词重复则无需处理(杂词不会触发) |
+| 书是英文、用户要中文笔记 | 正常:卡片写中文,anchor 保持英文;用词重合检查会自动关闭(跨语种),靠 anchor/数字/独立核对兜底 |
+| 极长的书(>40 万字) | 先 `bk skeleton` 判断哪些章可 `skip`/`skim`;章笔记并行;`bk digest --max-tier 2` 做综合 |
+| 上下文丢了 | `bk status -w work` → 按"下一步"继续,所有进度都在文件里 |
 
-## 1. 文件地图
-
+## 文件地图
 ```
-SKILL.md                     本文件(流程 + 硬性规则)
-references/
-  schema.md                  字段说明(与仓库文档同步)
-  book.schema.json           JSON Schema 原文
-  methodology.md             标注方法论
-  example-book.json          最小可用样例,可直接复制改写
-  prompts/01~04.md           四步提示词(抽命题 → 连关系 → 排大纲 → 自检)
-scripts/
-  extract_epub.py            EPUB → 按章 txt + chapters.json
-  validate_book.py           独立校验器(规则与仓库一致)
-  build_pages.py             校验 + 图论分析 + 生成两个 HTML
-  export_formats.py          md / csv / graphml / obsidian 导出
-assets/templates/
-  overview.html              总览导图模板(/*DATA*/ 占位)
-  network.html               关系网模板(/*DATA*/ 占位)
+SKILL.md                    本文件(流程 + 铁律)
+scripts/bk.py               命令行入口;bklib/ 是实现(摄入/校验/核对/渲染,仅标准库)
+references/prompts/00~05    各步的详细提示词(做到哪步读哪份,读完整份再动手)
+references/schema.md        所有文件的字段规范 + 完整例子
+references/method.md        设计原理:为什么这样拆、这样核对(维护者看)
+assets/guide.html           阅读指南的页面模板(/*DATA*/ 占位)
+tests/                      单元测试与变异测试(python -m unittest discover tests)
+evals/canary/               带"埋点"的虚构小册子 + 38 题理解测验 + 评测脚本
+REPORT.md                   重写说明与评测证据
 ```
-
-## 2. 工作流(按顺序执行,不要跳步)
-
-### 第 1 步:文本预处理与分章
-
-```bash
-python scripts/extract_epub.py book.epub -o work/text
-```
-
-产出 `work/text/000_序_….txt`、`001_1_….txt`… 和 `chapters.json`(章键/标题/字数)。**先人工核对** `chapters.json` 的章数与标题,再往下走。
-
-已知坑(务必检查):
-- 很多 EPUB 没有 `<h1>`,整本被压成几个大 HTML 块;脚本会按「第X章 / 自序 / 后记」标题行切,切不出来会退回「一个文件一章」并打提示。
-- 章标题可能单独一行("第三章")、正文只占下一页,脚本会把下一行短标题并入。
-- 页码、页眉、版权页会混进正文,标注时忽略即可,不要为它们建命题。
-- **版权**:原书文本只放临时目录,不要写进仓库或交付物;命题必须转述。
-
-### 第 2 步:逐章抽命题
-
-用 `references/prompts/01_extract_claims.md`,把 `{{书名}}`、`{{章}}`、`{{章键}}`、`{{章节文本}}` 替换成实际内容。一次一章,长书不要整本塞进去。
-
-### 第 3 步:建立关系
-
-用 `references/prompts/02_link_relations.md`。先章内、再跨章;跨章边必须写清理由。
-
-### 第 4 步:写大纲
-
-用 `references/prompts/03_outline.md`。结构是 篇 → 章 → 要点,每个要点挂命题 id。
-
-### 第 5 步:自检(必须做)
-
-```bash
-python scripts/validate_book.py work/book.json --strict
-```
-
-零错误、零提示才算过。再用 `references/prompts/04_review.md` 做语义审查(照抄、方向写反、推断边是否站得住、缺的跨章关系)。
-
-### 第 6 步:出图与报告
-
-```bash
-python scripts/build_pages.py work/book.json -o dist      # 两个 HTML
-python scripts/build_pages.py work/book.json --report     # 图论报告
-python scripts/build_pages.py work/book.json --report --json
-```
-
-### 第 7 步:交付
-
-- `dist/{书名}_总览导图.html`
-- `dist/{书名}_关系网.html`
-
-两页数据已内联,断网可看、可直接发给别人。**每本书用独立的 `-o` 目录**,否则同名文件会互相覆盖。
-
-需要给别的工具时再导出:
-
-```bash
-python scripts/export_formats.py work/book.json --format md       -o export/md
-python scripts/export_formats.py work/book.json --format csv      -o export/csv
-python scripts/export_formats.py work/book.json --format graphml  -o export/graphml
-python scripts/export_formats.py work/book.json --format obsidian -o export/obsidian
-```
-
-| 格式 | 产物 | 用途 |
-|---|---|---|
-| `md` | `{书名}_大纲.md` | XMind / 幕布 / MarkMind |
-| `csv` | `nodes.csv` + `edges.csv` | Gephi |
-| `graphml` | `{书名}.graphml` | Gephi / yEd / Cytoscape |
-| `obsidian` | 每个命题一页 md(frontmatter + `type:: [[链接]]`) | Obsidian + Dataview |
-
-`csv` 是固定文件名、`obsidian` 直接平铺,所以**每本书必须给不同的 `-o`**,否则会互相覆盖或混在一起。
-
-> 如果本机装了 book-graph 仓库的 CLI(`bookgraph`),上述命令都有同义版本:`bookgraph validate|analyze|build|export`。
-
-## 3. 数据契约(一个字都不能猜)
-
-顶层必须有这 7 个键,少一个校验就失败:
-`title`、`claimTypes`、`relTypes`、`chapters`、`claims`、`links`、`outline`。
-
-```json
-{
-  "profile": "nonfiction",
-  "title": "书名",
-  "subtitle": "",
-  "author": "",
-  "thesis": "一句话全书主张",
-  "claimTypes": {"V": "观点", "M": "机制", "F": "方法", "E": "依据"},
-  "relTypes": {"cause": "导致", "support": "支持", "solve": "化解",
-               "require": "需要", "oppose": "对立", "refine": "细化"},
-  "chapters": {"1": "第一章 ……", "2": "第二章 ……"},
-  "claims": [
-    {"id": "a1", "h": "短标签", "t": "用自己的话写成的完整句子。", "ty": "V", "ch": "1", "basis": "e"}
-  ],
-  "links": [
-    {"s": "a1", "t": "a2", "ty": "cause", "basis": "e", "note": "为什么有这条边"}
-  ],
-  "outline": [
-    {"id": "P1", "label": "第一篇", "sub": "", "color": "#8a7f6d", "thesis": "",
-     "chapters": [
-       {"k": "1", "title": "第一章 ……", "takeaway": "",
-        "points": [{"text": "要点一句话", "claims": ["a1"]}]}
-     ]}
-  ]
-}
-```
-
-| 字段 | 规则 |
-|---|---|
-| `chapters` | 键 → 章标题;**键的顺序就是书中顺序**,跨章距离据此计算 |
-| `claims[].id` | 全书唯一,建议「章前缀 + 序号」(a1、b2) |
-| `claims[].h` | ≤ 10 字,图上显示;超了会提示 |
-| `claims[].t` | 完整句子,≥ 10 字,转述不抄原文 |
-| `claims[].ty` | 必须在 `claimTypes` 里:V 观点 / M 机制 / F 方法 / E 依据 |
-| `claims[].ch` | 必须在 `chapters` 里 |
-| `claims[].basis` | `e` 书中明确写出 / `x` 作者经历、外部案例 |
-| `links[].s/t` | 必须都存在于 claims;不能自环 |
-| `links[].ty` | 必须在 `relTypes` 里 |
-| `links[].basis` | `e` 书中明确 / `i` 你的推断(页面画虚线,**如实标**) |
-| `links[].note` | 一句话说明依据,必写 |
-| `outline` | 每条命题至少出现在一个要点里;`k` 必须在 `chapters` 里;`color` 给篇用 |
-
-## 4. 标注硬规则
-
-1. 一个命题 = 一个能独立读懂的完整句子,不是名词短语,一条只说一件事。
-2. **一律转述**;与原书连续 15 字以上相同即视为抄录,必须改写。
-3. 类型语义:V 主张/判断;M 解释“为什么”的因果或原理;F 可照做的做法;E 案例/数据/亲身经历。
-4. 边方向:**从书中先说的指向后说的**,读作「s 作用于 t」。
-5. 推断边宁缺毋滥;只有书中只写了单向、但构成反馈回路时,才用 `i` 补反向。
-6. 不要为了图连通而硬连;孤立命题比乱连好,但要在大纲里解释它为何存在。
-
-## 5. 质量闸门
-
-交付前逐条确认:
-
-- [ ] `validate_book.py --strict` 零错误、零提示
-- [ ] 每章 6–14 条命题;整本量级参考:16 万字 ≈ 100 条(经验值,按信息密度调整)
-- [ ] 每条命题都进了某个大纲要点,且没有被大纲引用不存在的 id
-- [ ] 推断边占比 < 30%;超过就回去核对原文
-- [ ] 没有自环、没有重复边
-- [ ] 观点类(V)有支撑:不被 support/refine 指向的 V 要能解释原因
-- [ ] 随机抽 5 条命题对照原文,确认是转述而非摘抄
-
-## 6. 常见失败与修复
-
-| 现象 | 原因 | 处理 |
-|---|---|---|
-| `缺少顶层字段: claimTypes` | 只写了 title/claims/links/outline | 按第 3 节补全 7 个键 |
-| `未知章节 '3'` | claims 的 `ch` 不在 `chapters` | 统一章键,别混用“第三章”和“3” |
-| `大纲引用了不存在的命题` | 改了 id 没同步 outline | 全局替换 id 后重跑校验 |
-| 只切出 1 章 | EPUB 整本在一个文件 / 无标题行 | 手动按章拆 txt,或改用仓库 CLI 前先修文本 |
-| 页面打开是空白 | `/*DATA*/` 占位被破坏 | 用本包 `assets/templates` 原模板重出,不要手改 HTML |
-| `ModuleNotFoundError: networkx` | 没装依赖 | `pip install networkx` |
-| 终端中文乱码 | Windows 控制台编码 | `chcp 65001` 或设 `PYTHONIOENCODING=utf-8` |
-
-## 7. 边界与同步
-
-- 本包模板与规则对齐 **book-graph v0.1.0**。改动 `assets/templates` 或校验规则后,需与仓库 `src/bookgraph/` 同步,否则两边产物会不一致。
-- 迭代永远只改 `book.json`,**不要手改生成的 HTML**;改完重跑 `build_pages.py`。
-- 导出脚本是仓库 `src/bookgraph/export.py` 的副本,产物与 CLI 一致;需要更多分析维度时再用仓库 CLI。
