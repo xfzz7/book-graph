@@ -118,23 +118,25 @@ def plan(w: Work, issues, rate: float = 0.25, seed: int = 7, seeds: int = 6, ret
         rest = [i for i in picked if i not in musts]
         rng.shuffle(rest)
         picked = [i for i in picked if i in musts][:cap] + rest[:max(0, cap - len(musts))]
-    # 种子
+    # 种子:按故障类型轮流挑“适合这类故障”的条目,保证类型均衡
     seeded = {}
     pool = [i for i in picked if cur[i]["kind"] in ("card", "question") and cur[i]["refs"]]
     rng.shuffle(pool)
-    kinds = list(FAULTS)
-    si = 0
-    for iid in pool:
-        if len(seeded) >= seeds or si > len(pool) * 4:
-            break
-        kind = kinds[len(seeded) % len(kinds)]
-        for k in [kind] + [x for x in kinds if x != kind]:
-            r = _fault(cur[iid], k, w, rng)
+    used = set()
+    order = list(FAULTS)
+    guard = 0
+    while len(seeded) < seeds and guard < seeds * 4:
+        kind = order[guard % len(order)]
+        guard += 1
+        for iid in pool:
+            if iid in used:
+                continue
+            r = _fault(cur[iid], kind, w, rng)
             if r:
                 sid = f"s{len(seeded) + 1:02d}"
-                seeded[sid] = {"of": iid, "fault": k, "note": r[1], "item": r[0]}
+                seeded[sid] = {"of": iid, "fault": kind, "note": r[1], "item": r[0]}
+                used.add(iid)
                 break
-        si += 1
     entries = [(iid, cur[iid]) for iid in picked] + [(sid, s["item"]) for sid, s in seeded.items()]
     rng.shuffle(entries)
     # 打包
@@ -162,7 +164,8 @@ def plan(w: Work, issues, rate: float = 0.25, seed: int = 7, seeds: int = 6, ret
 
 def _render_entry(w: Work, iid: str, it: dict) -> str:
     voice = S.VOICES.get(it.get("voice") or "author", "")
-    lines = [f"## 条目 {iid}  〔{it['kind']}" + (f"/{it.get('ckind')}" if it.get("ckind") else "") + f"〕  标注立场: {voice}",
+    stance = f"  标注立场: {voice}" if it["kind"] == "card" else "  (非卡片条目:只核对内容是否忠实于原文;若条目把他人观点说成作者主张,算 misattributed)"
+    lines = [f"## 条目 {iid}  〔{it['kind']}" + (f"/{it.get('ckind')}" if it.get("ckind") else "") + f"〕{stance}",
              f"待核对文本: {it['text']}", "原文段落(★ 为被引用的段落,其余为上下文):"]
     for pid, text, hit in _context(w, it["refs"]):
         lines.append(f"{'★' if hit else ' '} [{pid}] {text}")
@@ -204,6 +207,16 @@ def apply(w: Work) -> dict:
         else:
             n_bad += 1
     w.write_json("audit/log.json", log)
-    w.write_json("audit/seed_result.json", seed_res)
+    # 种子识别率按“轮”累计(轮 = 种子文件内容的哈希),重复 apply 同一轮不会重复计数
+    prev = w.read_json("audit/seed_result.json") or {}
+    rounds = prev.get("rounds", {})
+    if not rounds and prev.get("total"):  # 兼容旧格式
+        rounds = {"legacy": {k: prev[k] for k in ("caught", "total", "missed")}}
+    if seed_res["total"]:
+        rounds[h(json.dumps(seeds, sort_keys=True))] = seed_res
+    tot = {"caught": sum(r["caught"] for r in rounds.values()), "total": sum(r["total"] for r in rounds.values()),
+           "missed": [m for r in rounds.values() for m in r["missed"]], "rounds": rounds}
+    w.write_json("audit/seed_result.json", tot)
+    seed_res = tot
     missing = [i for i in seeds if i not in got]
     return {"ok": n_ok, "flagged": n_bad, "seed": seed_res, "unanswered_seeds": missing, "total_logged": len(log)}
