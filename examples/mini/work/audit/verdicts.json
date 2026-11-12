@@ -1,0 +1,122 @@
+[
+ {
+  "id": "thesis",
+  "hash": "46867dbb4e",
+  "verdict": "ok",
+  "note": ""
+ },
+ {
+  "id": "P1",
+  "hash": "e50d950f68",
+  "verdict": "ok",
+  "note": ""
+ },
+ {
+  "id": "P2",
+  "hash": "8d3c2d4107",
+  "verdict": "ok",
+  "note": ""
+ },
+ {
+  "id": "P3",
+  "hash": "02bf109b95",
+  "verdict": "ok",
+  "note": ""
+ },
+ {
+  "id": "c02-k1",
+  "hash": "e6d88a30f3",
+  "verdict": "ok",
+  "note": ""
+ },
+ {
+  "id": "c02-k2",
+  "hash": "c4828bee30",
+  "verdict": "ok",
+  "note": ""
+ },
+ {
+  "id": "c03-k1",
+  "hash": "187fbddb99",
+  "verdict": "ok",
+  "note": ""
+ },
+ {
+  "id": "c03-k2",
+  "hash": "1d52c1ab30",
+  "verdict": "ok",
+  "note": ""
+ },
+ {
+  "id": "c04-k1",
+  "hash": "2b1f7d6828",
+  "verdict": "ok",
+  "note": ""
+ },
+ {
+  "id": "c04-k2",
+  "hash": "1370f0d9b0",
+  "verdict": "ok",
+  "note": ""
+ },
+ {
+  "id": "c02-k6",
+  "hash": "d853b8feca",
+  "verdict": "ok",
+  "note": ""
+ },
+ {
+  "id": "c03-k3",
+  "hash": "4e200d9753",
+  "verdict": "ok",
+  "note": ""
+ },
+ {
+  "id": "c02-k5",
+  "hash": "047ae03ae9",
+  "verdict": "ok",
+  "note": ""
+ },
+ {
+  "id": "c02-k4",
+  "hash": "1158487c91",
+  "verdict": "ok",
+  "note": ""
+ },
+ {
+  "id": "c03-k5",
+  "hash": "01dc514440",
+  "verdict": "ok",
+  "note": ""
+ },
+ {
+  "id": "c04-k3",
+  "hash": "bab3eca766",
+  "verdict": "ok",
+  "note": ""
+ },
+ {
+  "id": "c02-k3",
+  "hash": "598edb8ff9",
+  "verdict": "ok",
+  "note": ""
+ },
+ {
+  "id": "c04-k4",
+  "hash": "9eef6fda52",
+  "verdict": "ok",
+  "note": ""
+ },
+ {
+  "id": "c02-k7",
+  "hash": "d816a8cbfa",
+  "verdict": "ok",
+  "note": ""
+ },
+ {
+  "id": "c03-k4",
+  "hash": "c832bc55a0",
+  "verdict": "ok",
+  "note": ""
+ }
+]

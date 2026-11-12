@@ -1,0 +1,91 @@
+{
+ "title": "注意力的收支",
+ "author": "佚名",
+ "lang": "zh",
+ "split_by": "heading",
+ "source_file": "book.txt",
+ "chars": 999,
+ "tokens": 1104,
+ "chapters": [
+  {
+   "id": "c01",
+   "title": "(开头部分)",
+   "chars": 38,
+   "paras": 2,
+   "tokens": 41,
+   "skip": true,
+   "skip_reason": "正文开始前的零散内容(封面/版权/目录)",
+   "parts": [
+    {
+     "from": "c01-p001",
+     "to": "c01-p002",
+     "lines": [
+      1,
+      2
+     ],
+     "tokens": 41
+    }
+   ]
+  },
+  {
+   "id": "c02",
+   "title": "第一章 透支",
+   "chars": 390,
+   "paras": 4,
+   "tokens": 429,
+   "skip": false,
+   "skip_reason": "",
+   "parts": [
+    {
+     "from": "c02-p001",
+     "to": "c02-p004",
+     "lines": [
+      1,
+      4
+     ],
+     "tokens": 429
+    }
+   ]
+  },
+  {
+   "id": "c03",
+   "title": "第二章 进账",
+   "chars": 344,
+   "paras": 4,
+   "tokens": 382,
+   "skip": false,
+   "skip_reason": "",
+   "parts": [
+    {
+     "from": "c03-p001",
+     "to": "c03-p004",
+     "lines": [
+      1,
+      4
+     ],
+     "tokens": 382
+    }
+   ]
+  },
+  {
+   "id": "c04",
+   "title": "第三章 记账",
+   "chars": 227,
+   "paras": 3,
+   "tokens": 252,
+   "skip": false,
+   "skip_reason": "",
+   "parts": [
+    {
+     "from": "c04-p001",
+     "to": "c04-p003",
+     "lines": [
+      1,
+      3
+     ],
+     "tokens": 252
+    }
+   ]
+  }
+ ]
+}

@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>《__TITLE__》导读</title>
+<style>
+:root{--bg:#f7f5f0;--card:#fffdf8;--ink:#23211d;--mut:#77726a;--line:#e2ddd2;--acc:#a8452c;--accbg:#f6e9e3;
+--claim:#a8452c;--reason:#35607f;--evidence:#5d7a45;--method:#8a6a1f;--caveat:#7b5a8c;--counter:#8b8b8b;--ok:#4c7a4c;--warn:#b0761f}
+@media(prefers-color-scheme:dark){:root{--bg:#1b1a18;--card:#242320;--ink:#e9e5dc;--mut:#9c968a;--line:#3a3833;--acc:#e08a6d;--accbg:#3a2a24;
+--claim:#e08a6d;--reason:#7fb0d6;--evidence:#9cc07c;--method:#d8b25c;--caveat:#b99acb;--counter:#a0a0a0;--ok:#8fc08f;--warn:#d9a54f}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.75 -apple-system,"PingFang SC","Hiragino Sans GB","Microsoft YaHei","Noto Sans CJK SC",system-ui,sans-serif}
+header{position:sticky;top:0;z-index:20;background:var(--bg);border-bottom:1px solid var(--line);padding:10px 20px 0}
+.hrow{display:flex;gap:14px;align-items:baseline;flex-wrap:wrap;max-width:1080px;margin:0 auto}
+h1{font-size:19px;margin:0;font-weight:700}.by{color:var(--mut);font-size:13px}
+nav{display:flex;gap:2px;max-width:1080px;margin:8px auto 0;overflow-x:auto}
+nav button{border:0;background:none;color:var(--mut);font:inherit;font-size:15px;padding:7px 14px;cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap}
+nav button.on{color:var(--acc);border-color:var(--acc);font-weight:600}
+nav small{font-size:11px;opacity:.7;margin-left:3px}
+#search{margin-left:auto;border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:8px;padding:5px 10px;font:inherit;font-size:14px;width:190px}
+main{max-width:1080px;margin:0 auto;padding:22px 20px 90px}
+section{display:none}section.on{display:block}
+h2{font-size:17px;margin:30px 0 10px;padding-left:10px;border-left:3px solid var(--acc)}h2:first-child{margin-top:0}
+h2 small,.hint{font-weight:400;color:var(--mut);font-size:13px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px 18px;margin:10px 0}
+.lead{font-size:13px;color:var(--mut);letter-spacing:.06em;margin-bottom:2px}
+.thesis{font-size:21px;line-height:1.6;font-weight:650}
+.q{font-size:17px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:12px}
+.pill{display:inline-block;font-size:12px;line-height:1.5;padding:0 7px;border-radius:9px;border:1px solid currentColor;margin-right:5px;white-space:nowrap;vertical-align:1px}
+.k-claim{color:var(--claim)}.k-reason{color:var(--reason)}.k-evidence{color:var(--evidence)}.k-method{color:var(--method)}.k-caveat{color:var(--caveat)}.k-counter{color:var(--counter)}
+.pid{display:inline-block;background:var(--acc);color:#fff;border-radius:6px;font-size:12px;font-weight:700;padding:0 6px;margin-right:6px;line-height:1.6}
+.mut{color:var(--mut)}.sm{font-size:13.5px}
+.pcard h3{margin:0 0 4px;font-size:16px}.pcard p{margin:4px 0}
+.chips span{display:inline-block;font-size:12px;background:var(--accbg);border-radius:8px;padding:0 8px;margin:2px 4px 2px 0}
+.chips .none{background:none;border:1px dashed var(--warn);color:var(--warn)}
+table{border-collapse:collapse;width:100%;font-size:14px}
+th,td{text-align:left;padding:7px 8px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-weight:600;color:var(--mut);font-size:12.5px;white-space:nowrap}
+td.dots{white-space:nowrap}
+.dot{display:inline-block;width:20px;height:20px;line-height:20px;text-align:center;border-radius:50%;font-size:10px;font-weight:700;margin-right:2px;background:var(--line);color:transparent}
+.dot.on{background:var(--acc);color:#fff}
+.pr{font-size:12px;padding:1px 8px;border-radius:9px;white-space:nowrap}
+.pr-must{background:var(--acc);color:#fff}.pr-skim{background:var(--accbg);color:var(--acc)}.pr-skip{background:var(--line);color:var(--mut)}
+.bar{height:5px;background:var(--line);border-radius:3px;min-width:50px}.bar i{display:block;height:5px;background:var(--mut);border-radius:3px}
+a,.lk{color:var(--acc);cursor:pointer;text-decoration:none}.lk:hover{text-decoration:underline}
+/* 论证树 */
+.tools{display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin:6px 0 12px;font-size:13.5px;color:var(--mut)}
+.tools button,.seg button{border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:8px;padding:3px 11px;font:inherit;font-size:13.5px;cursor:pointer}
+.tools button.on,.seg button.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.tree ul{list-style:none;margin:0;padding-left:22px;border-left:1px dashed var(--line)}
+.tree>ul{padding-left:0;border:0}
+.node{margin:5px 0}
+.nrow{display:flex;gap:6px;align-items:flex-start;padding:5px 8px;border-radius:8px;cursor:pointer}
+.nrow:hover{background:var(--accbg)}
+.tw{flex:none;width:16px;color:var(--mut);font-size:12px;line-height:28px;user-select:none}
+.rel{flex:none;font-size:12px;color:var(--mut);line-height:28px;white-space:nowrap}
+.ntext{flex:1}.w-core>.nrow .ntext{font-weight:600}.w-detail>.nrow .ntext{color:var(--mut);font-size:14.5px}
+.chtag{font-size:12px;color:var(--mut);white-space:nowrap;margin-left:6px}
+.node.closed>ul{display:none}
+.root>.nrow{background:var(--card);border:1px solid var(--line)}
+/* 逐章 */
+.two{display:grid;grid-template-columns:230px 1fr;gap:20px}
+.side{position:sticky;top:104px;align-self:start;max-height:calc(100vh - 120px);overflow:auto;font-size:14px}
+.side div{padding:5px 9px;border-radius:8px;cursor:pointer;display:flex;gap:6px;justify-content:space-between}
+.side div.on{background:var(--accbg);color:var(--acc);font-weight:600}.side div.skipd{color:var(--mut);cursor:default;font-size:12.5px}
+.claim{padding:8px 10px;border-radius:8px;cursor:pointer;margin:2px 0}
+.claim:hover{background:var(--accbg)}.claim.w-core{font-weight:600}.claim.w-detail{color:var(--mut);font-size:14.5px}
+.loc{font-size:12.5px;color:var(--mut);font-weight:400}
+/* 抽屉 */
+#drawer{position:fixed;top:0;right:0;bottom:0;width:min(440px,94vw);background:var(--card);border-left:1px solid var(--line);box-shadow:-8px 0 30px rgba(0,0,0,.12);z-index:40;transform:translateX(105%);transition:transform .18s;overflow:auto;padding:18px 20px 60px}
+#drawer.on{transform:none}
+#drawer .x{position:absolute;right:14px;top:10px;font-size:22px;cursor:pointer;color:var(--mut);border:0;background:none}
+#drawer h4{margin:18px 0 4px;font-size:13px;color:var(--mut);font-weight:600;letter-spacing:.05em}
+#drawer .big{font-size:17px;font-weight:600;line-height:1.65;margin:8px 0}
+.quote{border-left:3px solid var(--line);padding:2px 10px;color:var(--mut);font-size:14px}
+.rl{padding:5px 0;border-bottom:1px dashed var(--line);font-size:14.5px;cursor:pointer}.rl:hover{color:var(--acc)}
+/* 概念 审视 自测 */
+.cterm{font-size:16.5px;font-weight:650}
+.vs{font-size:14px;margin-top:6px;padding:6px 10px;background:var(--accbg);border-radius:8px}
+.notice{font-size:13.5px;background:var(--accbg);border-radius:10px;padding:9px 13px;margin:8px 0 14px}
+.qa{cursor:pointer}.qa .ans{display:none;margin-top:8px;padding-top:8px;border-top:1px dashed var(--line)}
+.qa.open .ans{display:block}.qa .try{font-size:13px;color:var(--mut)}
+.qa.open .try{display:none}
+.rate{margin-top:8px;display:flex;gap:6px;align-items:center;font-size:13px;color:var(--mut)}
+.rate button{border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:8px;padding:2px 10px;font:inherit;font-size:13px;cursor:pointer}
+.rate button.on.y{background:var(--ok);color:#fff;border-color:var(--ok)}.rate button.on.n{background:var(--warn);color:#fff;border-color:var(--warn)}
+.prog{font-size:13.5px;color:var(--mut)}
+mark{background:#ffe08a;color:#222;border-radius:3px}
+footer{max-width:1080px;margin:0 auto;padding:0 20px 40px;color:var(--mut);font-size:12.5px;line-height:1.7}
+@media(max-width:760px){.two{grid-template-columns:1fr}.side{position:static;max-height:none;display:flex;flex-wrap:wrap;gap:4px}#search{width:100%;margin:6px 0 0}body{font-size:15.5px}.hidem{display:none}}
+@media print{header,#drawer,.tools,.side{display:none}section{display:block!important}.qa .ans{display:block}}
+</style>
+</head>
+<body>
+<header>
+  <div class="hrow"><h1 id="title"></h1><span class="by" id="by"></span><input id="search" placeholder="搜索全部内容…" autocomplete="off"></div>
+  <nav id="nav"></nav>
+</header>
+<main id="main"></main>
+<footer id="foot"></footer>
+<aside id="drawer"><button class="x" onclick="closeDrawer()">×</button><div id="dbody"></div></aside>
+<script>
+const D=/*DATA*/null/*END*/;
+const L=D.labels,B=D.book,CH=D.chapters.filter(c=>!c.skip);
+const C={},CHM={};D.chapters.forEach(ch=>{CHM[ch.id]=ch;(ch.claims||[]).forEach(c=>{c.ch=ch.id;C[c.id]=c})});
+const P={};B.pillars.forEach(p=>P[p.id]=p);
+const esc=s=>String(s??'').replace(/[&<>"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]));
+const $=(s,r=document)=>r.querySelector(s),$$=(s,r=document)=>[...r.querySelectorAll(s)];
+const chShort=id=>{const t=CHM[id]?.title||id;return t.length>14?t.slice(0,13)+'…':t};
+const kindPill=c=>`<span class="pill k-${c.kind}">${esc(L.kind[c.kind]||c.kind)}${c.ev?' · '+esc(L.ev[c.ev]||c.ev):''}</span>`;
+const store={get(k,d){try{return JSON.parse(localStorage.getItem('bg:'+D.meta.title+':'+k))??d}catch(e){return d}},set(k,v){try{localStorage.setItem('bg:'+D.meta.title+':'+k,JSON.stringify(v))}catch(e){}}};
+
+// 关系:对每个节点,"下级"是支撑/解释它的东西
+const kids={},ups={};
+const REL_DOWN={supports:'支持它',causes:'原因',refines:'细化',limits:'限定它',applies:'做法',requires:'前提',rebuts:'反驳了'};
+const REL_UP={supports:'支持',causes:'导致',refines:'细化了',limits:'限定了',applies:'落实',requires:'是其前提',rebuts:'被其反驳'};
+D.links.forEach(l=>{
+  const [parent,child]=(l.type==='requires'||l.type==='rebuts')?[l.from,l.to]:[l.to,l.from];
+  (kids[parent]=kids[parent]||[]).push({id:child,type:l.type,note:l.note});
+  (ups[child]=ups[child]||[]).push({id:parent,type:l.type,note:l.note});
+});
+
+const TABS=[['overview','速览','5 分钟'],['argument','论证','骨架'],['chapters','逐章',''],['concepts','概念',''],['critique','审视',''],['quiz','自测','']];
+$('#title').textContent='《'+D.meta.title+'》导读';
+$('#by').textContent=[D.meta.author,'原书约 '+Math.round(D.meta.chars/1000)/10+' 万字'].filter(Boolean).join(' · ');
+$('#nav').innerHTML=TABS.map(([id,t,s])=>`<button data-tab="${id}">${t}${s?`<small>${s}</small>`:''}</button>`).join('');
+$('#main').innerHTML=TABS.map(([id])=>`<section id="s-${id}"></section>`).join('')+'<section id="s-search"></section>';
+function show(tab){$$('nav button').forEach(b=>b.classList.toggle('on',b.dataset.tab===tab));$$('main section').forEach(s=>s.classList.toggle('on',s.id==='s-'+tab));if(tab!=='search'){location.hash=tab;window.scrollTo(0,0)}}
+$('#nav').onclick=e=>{const b=e.target.closest('button');if(b){$('#search').value='';show(b.dataset.tab)}};
+
+// ---------- 速览 ----------
+function renderOverview(){
+  const maxc=Math.max(...CH.map(c=>c.chars));
+  const pcards=B.pillars.map(p=>{
+    const ev=Object.entries(p.evidence);
+    return `<div class="card pcard"><h3><span class="pid">${p.id}</span>${esc(p.title)}</h3><p>${esc(p.statement)}</p>
+    <p class="sm mut">↳ ${esc(p.how)}</p>
+    ${p.depends_on.length?`<p class="sm mut">前提:${p.depends_on.map(d=>`<span class="pid">${d}</span>${esc(P[d]?.title||'')}`).join(' ')}</p>`:''}
+    <div class="chips sm"><span class="mut" style="background:none;padding-left:0">证据构成</span>${ev.length?ev.map(([k,v])=>`<span>${esc(L.ev[k]||k)} × ${v}</span>`).join(''):'<span class="none">笔记中没有直接证据</span>'}</div>
+    <p class="sm"><span class="lk" onclick="gotoPillar('${p.id}')">看它的论证 →</span></p></div>`}).join('');
+  const rows=D.chapters.map(ch=>ch.skip?'':`<tr><td><span class="lk" onclick="gotoChapter('${ch.id}')">${esc(ch.title)}</span><div class="bar" title="${ch.chars} 字"><i style="width:${Math.round(ch.chars/maxc*100)}%"></i></div></td>
+    <td><span class="pr pr-${ch.priority}">${esc(L.priority[ch.priority]||'')}</span></td>
+    <td class="dots hidem">${B.pillars.map(p=>`<span class="dot ${p.chapters.includes(ch.id)?'on':''}" title="${esc(p.title)}">${p.id.slice(1)}</span>`).join('')}</td>
+    <td>${esc(ch.role)}<div class="sm mut">${esc(ch.why)}</div></td></tr>`).join('');
+  $('#s-overview').innerHTML=`
+  <div class="card"><div class="lead">这本书要回答的问题</div><div class="q">${esc(B.question)}</div></div>
+  <div class="card"><div class="lead">核心论点</div><div class="thesis">${esc(B.thesis)}</div><p style="margin:10px 0 0">${esc(B.abstract)}</p>${B.book_type?`<p class="sm mut" style="margin:6px 0 0">类型:${esc(B.book_type)}</p>`:''}</div>
+  <h2>论点靠什么撑起来 <small>${B.pillars.length} 根支柱;"证据构成"统计的是每根支柱背后的证据类型</small></h2>
+  <div class="grid">${pcards}</div>
+  <h2>全书结构与读法 <small>圆点 = 该章为哪根支柱提供了论证</small></h2>
+  <div class="card" style="padding:6px 10px"><table><tr><th>章</th><th>建议</th><th class="hidem">支柱</th><th>它在全书中的作用 / 建议理由</th></tr>${rows}</table></div>
+  ${B.takeaways.length?`<h2>读完可以带走的</h2><div class="card"><ul style="margin:0;padding-left:20px">${B.takeaways.map(t=>`<li>${esc(t)}</li>`).join('')}</ul></div>`:''}
+  <h2>怎么用这份导读</h2>
+  <div class="card sm"><b>没读过原书</b>:先看本页,再到「论证」逐层展开,最后去「审视」看哪里该打折扣。&nbsp; <b>正在读原书</b>:读每章前后看「逐章」,对照主干有没有抓住。&nbsp; <b>读完了</b>:直接做「自测」,答不出的题会带你回到对应论证。<br>
+  每条内容都可以点开:里面的「定位」是一小段原文,在你的电子书里搜索它就能找到出处。</div>`;
+}
+
+// ---------- 论证树 ----------
+let treeDepth=store.get('depth','core');
+function nodeHTML(id,rel,seen,depth){
+  const c=C[id];if(!c)return'';
+  const again=seen.has(id);const s2=new Set(seen);s2.add(id);
+  let ks=again?[]:(kids[id]||[]);
+  if(treeDepth==='core')ks=ks.filter(k=>C[k.id]&&C[k.id].weight!=='detail');
+  const order={claim:0,reason:1,method:2,evidence:3,caveat:4,counter:5};
+  ks=[...ks].sort((a,b)=>(order[C[a.id]?.kind]??9)-(order[C[b.id]?.kind]??9));
+  const closed=depth>=(treeDepth==='all'?9:1)&&ks.length;
+  return `<li class="node w-${c.weight} ${closed?'closed':''}" data-id="${id}"><div class="nrow"><span class="tw">${ks.length?(closed?'▸':'▾'):''}</span>${rel?`<span class="rel">${rel}</span>`:''}
+  <span class="ntext">${kindPill(c)}${esc(c.text)}<span class="chtag">${esc(chShort(c.ch))}${again?' · 上文已出现':''}</span></span></div>
+  ${ks.length?`<ul>${ks.map(k=>nodeHTML(k.id,REL_DOWN[k.type],s2,depth+1)).join('')}</ul>`:''}</li>`;
+}
+function desc(id,seen=new Set()){(kids[id]||[]).forEach(k=>{if(!seen.has(k.id)){seen.add(k.id);desc(k.id,seen)}});return seen}
+function topClaims(p){const out=[];p.claims.forEach(id=>{if(!out.some(o=>desc(o).has(id)))out.push(id)});return out.filter(id=>!out.some(o=>o!==id&&desc(o).has(id)))}
+function renderArgument(){
+  const inPillar=new Set(Object.values(C).filter(c=>c.pillars.length).map(c=>c.id));
+  const loose=Object.values(C).filter(c=>c.weight==='core'&&!c.pillars.length);
+  const pil=B.pillars.map(p=>`<li class="node root" data-pillar="${p.id}" id="pil-${p.id}"><div class="nrow"><span class="tw">▾</span><span class="ntext"><span class="pid">${p.id}</span><b>${esc(p.title)}</b>:${esc(p.statement)}
+    ${p.depends_on.length?`<span class="chtag">以 ${p.depends_on.join('、')} 为前提</span>`:''}</span></div>
+    <ul>${topClaims(p).map(id=>nodeHTML(id,'',new Set(),0)).join('')}</ul></li>`).join('');
+  $('#s-argument').innerHTML=`
+  <div class="card"><div class="lead">核心论点</div><div class="thesis" style="font-size:19px">${esc(B.thesis)}</div></div>
+  <div class="tools">展开到 <span class="seg"><button data-d="pillar">支柱</button><button data-d="core">主干+支撑</button><button data-d="all">全部细节</button></span>
+  <span class="hint">每个支柱下面是撑起它的各章主干;再往下是各主干的理由、证据、限定和被反驳的对手观点。点任意一条看出处与关联。</span></div>
+  <div class="tree"><ul>${pil}</ul></div>
+  ${loose.length?`<h2>没有归入支柱的主干 <small>各章里重要、但不直接承担全书论证的内容</small></h2><div class="tree"><ul>${loose.map(c=>nodeHTML(c.id,'',new Set(),1)).join('')}</ul></div>`:''}
+  <p class="sm mut" style="margin-top:18px">图例:${Object.keys(L.kind).map(k=>`<span class="pill k-${k}">${L.kind[k]}</span>`).join('')} 其中「对手观点」是作者引述并<b>反对</b>的说法,不是作者的主张。</p>`;
+  $$('#s-argument .seg button').forEach(b=>{b.classList.toggle('on',b.dataset.d===treeDepth);b.onclick=()=>{treeDepth=b.dataset.d;store.set('depth',treeDepth);renderArgument()}});
+  if(treeDepth==='pillar')$$('#s-argument .root').forEach(n=>{n.classList.add('closed');$('.tw',n).textContent='▸'});
+}
+document.addEventListener('click',e=>{
+  const tw=e.target.closest('.tw');
+  if(tw&&tw.textContent.trim()){const n=tw.closest('.node');n.classList.toggle('closed');tw.textContent=n.classList.contains('closed')?'▸':'▾';return}
+  const row=e.target.closest('.nrow');
+  if(row){const n=row.closest('.node');if(n.dataset.id)openClaim(n.dataset.id);else if(n.dataset.pillar){n.classList.toggle('closed');$('.tw',n).textContent=n.classList.contains('closed')?'▸':'▾'}return}
+  const cl=e.target.closest('[data-claim]');if(cl){openClaim(cl.dataset.claim);return}
+  if(!e.target.closest('#drawer'))closeDrawer();
+});
+function gotoPillar(id){show('argument');if(treeDepth==='pillar'){treeDepth='core';renderArgument()}const el=$('#pil-'+id);if(el){el.classList.remove('closed');el.scrollIntoView({block:'start'});window.scrollBy(0,-110)}}
+
+// ---------- 抽屉 ----------
+function posText(p){if(p==null)return'';return p<.2?'本章开头':p<.4?'本章前段':p<.6?'本章中段':p<.8?'本章后段':'本章结尾'}
+function openClaim(id){
+  const c=C[id];if(!c)return;
+  const rel=(arr,map)=>arr.map(k=>C[k.id]?`<div class="rl" data-claim="${k.id}"><span class="mut sm">${map[k.type]||''}</span> ${kindPill(C[k.id])}${esc(C[k.id].text)} <span class="chtag">${esc(chShort(C[k.id].ch))}</span>${k.note?`<div class="sm mut">${esc(k.note)}</div>`:''}</div>`:'').join('');
+  const crit=B.critique.filter(x=>(x.targets||[]).some(t=>t===id||c.pillars.includes(t)));
+  const qs=B.questions.filter(x=>(x.claims||[]).includes(id));
+  $('#dbody').innerHTML=`<div>${kindPill(c)}<span class="pill mut">${esc(L.weight[c.weight]||'')}</span>${c.pillars.map(p=>`<span class="pid">${p}</span>`).join('')}</div>
+  <div class="big">${esc(c.text)}</div>
+  ${c.kind==='counter'?'<div class="notice">这是作者引述并<b>反对</b>的观点,不是作者的主张。</div>':''}
+  <h4>出处</h4><div class="sm"><span class="lk" onclick="gotoChapter('${c.ch}')">${esc(CHM[c.ch].title)}</span> · ${posText(c.pos)}</div>
+  <div class="quote">定位:「${esc(c.quote)}」<div class="sm">在你的书里搜索这段文字即可找到原文。</div></div>
+  ${(kids[id]||[]).length?`<h4>它的依据与展开</h4>${rel(kids[id],REL_DOWN)}`:''}
+  ${(ups[id]||[]).length?`<h4>它所服务的</h4>${rel(ups[id],REL_UP)}`:''}
+  ${crit.length?`<h4>审视(导读的分析)</h4>${crit.map(x=>`<div class="rl" onclick="show('critique')"><span class="pill mut">${esc(L.crit[x.type])}</span>${esc(x.text)}</div>`).join('')}`:''}
+  ${qs.length?`<h4>相关自测题</h4>${qs.map(x=>`<div class="rl" onclick="show('quiz')">${esc(x.q)}</div>`).join('')}`:''}`;
+  $('#drawer').classList.add('on');
+}
+function closeDrawer(){$('#drawer').classList.remove('on')}
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeDrawer()});
+
+// ---------- 逐章 ----------
+let curCh=CH[0]?.id,chLevel=store.get('chLevel','support');
+function renderChapters(){
+  const ch=CHM[curCh];
+  const side=D.chapters.map(c=>c.skip?`<div class="skipd" title="${esc(c.why||'')}">${esc(chShort(c.id))}<span>未纳入</span></div>`:
+    `<div class="${c.id===curCh?'on':''}" onclick="gotoChapter('${c.id}')"><span>${esc(c.title)}</span></div>`).join('');
+  const lv={core:['core'],support:['core','support'],all:['core','support','detail']}[chLevel];
+  const cl=ch.claims.filter(c=>lv.includes(c.weight));
+  const cps=B.concepts.filter(cp=>ch.concepts.includes(cp.term)||(cp.aka||[]).some(a=>ch.concepts.includes(a)));
+  $('#s-chapters').innerHTML=`<div class="two"><div class="side">${side}</div><div>
+  <h2 style="margin-top:0">${esc(ch.title)} <span class="pr pr-${ch.priority}">${esc(L.priority[ch.priority]||'')}</span></h2>
+  <div class="card"><div class="lead">这一章在全书里的作用</div><div style="font-weight:600">${esc(ch.role)}</div><p style="margin:8px 0 0">${esc(ch.summary)}</p>
+  ${ch.why?`<p class="sm mut" style="margin:8px 0 0">读法建议:${esc(ch.why)}</p>`:''}
+  ${cps.length?`<p class="sm" style="margin:8px 0 0"><span class="mut">本章概念:</span>${cps.map(cp=>`<span class="lk" onclick="gotoConcept('${esc(cp.term)}')">${esc(cp.term)}</span>`).join('、')}</p>`:''}</div>
+  <div class="tools">显示 <span class="seg"><button data-l="core">只看主干</button><button data-l="support">主干+支撑</button><button data-l="all">全部</button></span><span class="hint">按书中出现顺序;共 ${ch.claims.length} 条</span></div>
+  <div class="card" style="padding:8px">${cl.map(c=>`<div class="claim w-${c.weight}" data-claim="${c.id}">${kindPill(c)}${esc(c.text)} <span class="loc">${c.pillars.map(p=>`<span class="pid">${p}</span>`).join('')}</span></div>`).join('')}</div>
+  ${ch.skipped.length?`<p class="sm mut">本章未做笔记的部分:${ch.skipped.map(esc).join(';')}</p>`:''}
+  </div></div>`;
+  $$('#s-chapters .seg button').forEach(b=>{b.classList.toggle('on',b.dataset.l===chLevel);b.onclick=()=>{chLevel=b.dataset.l;store.set('chLevel',chLevel);renderChapters()}});
+}
+function gotoChapter(id){curCh=id;renderChapters();closeDrawer();show('chapters')}
+
+// ---------- 概念 ----------
+function renderConcepts(){
+  $('#s-concepts').innerHTML=`<p class="hint">作者赋予了特定含义的术语。读不懂一本书,常常是因为用日常含义去理解了作者的专门用语。</p><div class="grid">`+
+  B.concepts.map(cp=>`<div class="card" id="cp-${esc(cp.term)}"><div class="cterm">${esc(cp.term)}${(cp.aka||[]).length?` <span class="sm mut">又称 ${cp.aka.map(esc).join('、')}</span>`:''}</div>
+  <div>${esc(cp.def)}</div>
+  ${cp.evolution?`<div class="vs"><b>含义的演变</b>:${esc(cp.evolution)}</div>`:''}
+  ${(cp.vs||[]).map(v=>`<div class="vs"><b>别和「${esc(v.term)}」混淆</b>:${esc(v.diff)}</div>`).join('')}
+  <div class="sm mut" style="margin-top:6px">出现于:${cp.chapters.map(c=>`<span class="lk" onclick="gotoChapter('${c}')">${esc(chShort(c))}</span>`).join('、')}</div></div>`).join('')+'</div>';
+}
+function gotoConcept(t){show('concepts');const el=document.getElementById('cp-'+t);if(el){el.scrollIntoView({block:'center'});el.style.outline='2px solid var(--acc)';setTimeout(()=>el.style.outline='',1600)}}
+
+// ---------- 审视 ----------
+function tgt(t){if(t==='thesis')return'<span class="pid">核心论点</span>';if(P[t])return`<span class="lk" onclick="gotoPillar('${t}')"><span class="pid">${t}</span>${esc(P[t].title)}</span>`;if(C[t])return`<span class="lk" data-claim="${t}">「${esc(C[t].text.slice(0,26))}…」</span>`;return esc(t)}
+function renderCritique(){
+  const order=['gap','assumption','objection','scope','strength'];
+  $('#s-critique').innerHTML=`<div class="notice"><b>这一页不是作者的观点。</b>它是导读(AI)对这本书论证质量的分析,帮你决定哪些结论可以直接采信、哪些需要打折扣。它本身也可能有错——请把它当作提问清单,而不是定论。</div>`+
+  order.filter(t=>B.critique.some(c=>c.type===t)).map(t=>`<h2>${esc(L.crit[t])}</h2>`+B.critique.filter(c=>c.type===t).map(c=>`<div class="card"><div>${esc(c.text)}</div><div class="sm mut" style="margin-top:6px">针对:${(c.targets||[]).map(tgt).join(' ')}</div></div>`).join('')).join('')+
+  `<h2>作者自己承认的限定 <small>来自原书</small></h2><div class="card" style="padding:8px">${Object.values(C).filter(c=>c.kind==='caveat').map(c=>`<div class="claim" data-claim="${c.id}">${kindPill(c)}${esc(c.text)} <span class="chtag">${esc(chShort(c.ch))}</span></div>`).join('')||'<div class="sm mut" style="padding:6px">笔记中没有记录到作者的自我限定。</div>'}</div>`;
+}
+
+// ---------- 自测 ----------
+let quizOnly=false;
+function renderQuiz(){
+  const st=store.get('quiz',{});
+  const known=B.questions.filter((q,i)=>st[i]==='y').length;
+  const order=['recall','explain','apply','evaluate'];
+  $('#s-quiz').innerHTML=`<p class="hint">先在心里(或纸上)答,再点开对照。能用自己的话讲出来,才算读懂了。答不出就点「依据」回到对应论证。</p>
+  <div class="tools"><span class="prog">已掌握 ${known} / ${B.questions.length}</span><button class="${quizOnly?'on':''}" id="qonly">只看未掌握</button><button id="qreset">清空记录</button></div>`+
+  order.filter(lv=>B.questions.some(q=>q.level===lv)).map(lv=>`<h2>${esc(L.level[lv])} <small>${{recall:'书里说了什么',explain:'为什么这么说、各部分如何相连',apply:'换个情境还会用吗',evaluate:'这个论证站得住吗'}[lv]}</small></h2>`+
+    B.questions.map((q,i)=>q.level!==lv||(quizOnly&&st[i]==='y')?'':`<div class="card qa" data-q="${i}"><div><b>${esc(q.q)}</b></div><div class="try">点击查看参考答案</div>
+    <div class="ans">${esc(q.a)}<div class="sm mut" style="margin-top:6px">依据:${(q.claims||[]).map(tgt).join(' ')}</div>
+    <div class="rate">我答对了吗?<button class="y ${st[i]==='y'?'on':''}" data-r="y">掌握了</button><button class="n ${st[i]==='n'?'on':''}" data-r="n">还不行</button></div></div></div>`).join('')).join('');
+  $('#qonly').onclick=()=>{quizOnly=!quizOnly;renderQuiz()};
+  $('#qreset').onclick=()=>{store.set('quiz',{});renderQuiz()};
+  $$('#s-quiz .qa').forEach(el=>el.onclick=e=>{
+    const r=e.target.closest('[data-r]');
+    if(r){const s=store.get('quiz',{});s[el.dataset.q]=r.dataset.r;store.set('quiz',s);renderQuiz();return}
+    if(e.target.closest('.lk'))return;el.classList.toggle('open')});
+}
+
+// ---------- 搜索 ----------
+function hl(s,q){const i=s.toLowerCase().indexOf(q);return i<0?esc(s):esc(s.slice(0,i))+'<mark>'+esc(s.slice(i,i+q.length))+'</mark>'+esc(s.slice(i+q.length))}
+$('#search').oninput=e=>{
+  const q=e.target.value.trim().toLowerCase();
+  if(!q){show(location.hash.slice(1)||'overview');return}
+  const cl=Object.values(C).filter(c=>(c.text+c.quote).toLowerCase().includes(q));
+  const cp=B.concepts.filter(c=>(c.term+c.def+(c.aka||[]).join('')).toLowerCase().includes(q));
+  $('#s-search').innerHTML=`<h2>概念 <small>${cp.length}</small></h2>${cp.map(c=>`<div class="card" style="cursor:pointer" onclick="gotoConcept('${esc(c.term)}')"><b>${hl(c.term,q)}</b>:${hl(c.def,q)}</div>`).join('')||'<p class="mut sm">无</p>'}
+  <h2>笔记 <small>${cl.length}</small></h2><div class="card" style="padding:8px">${cl.map(c=>`<div class="claim w-${c.weight}" data-claim="${c.id}">${kindPill(c)}${hl(c.text,q)} <span class="chtag">${esc(chShort(c.ch))}</span></div>`).join('')||'<p class="mut sm">无</p>'}</div>`;
+  $$('nav button').forEach(b=>b.classList.remove('on'));$$('main section').forEach(s=>s.classList.toggle('on',s.id==='s-search'));
+};
+
+// ---------- 页脚 ----------
+(function(){const s=D.meta.stats,a=s.audit||{};
+$('#foot').innerHTML=`<b>可靠性说明</b> · 这份导读由 AI 阅读全书后生成(${D.meta.generated})。共 ${s.claims} 条笔记、${s.concepts} 个概念,覆盖 ${s.chapters} 章;每条笔记都带原文锚点,并经程序核对"定位片段确实出现在所指段落"。`+
+(a.total?`另由独立核查逐条对照原文抽查了 ${a.total} 条:${a.ok} 条通过,${a.fixed} 条发现问题后已修正${a.open?`,<b>${a.open} 条尚未解决</b>`:''}。`:'<b>未做独立核查</b>,请对内容保持更多警惕。')+
+(s.warnings?`仍有 ${s.warnings} 条程序提示未处理。`:'')+
+`<br>全部内容是对原书的转述与分析,不含原文段落(用于定位的短片段合计约占原书 ${s.quote_pct}%)。转述难免有损,重要的判断请回到原书核对。`})();
+
+renderOverview();renderArgument();renderChapters();renderConcepts();renderCritique();renderQuiz();
+show((location.hash.slice(1)&&TABS.some(t=>t[0]===location.hash.slice(1)))?location.hash.slice(1):'overview');
+</script>
+</body>
+</html>
