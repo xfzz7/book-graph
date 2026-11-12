@@ -33,7 +33,7 @@
 | `parent` | ✓(可 null) | 挂在哪张卡下;null = 顶层卡 |
 | `rel` | 有 parent 时必填 | supports / explains / illustrates / elaborates / qualifies / objects / rebuts / revises |
 | `refs` | ✓ | 1~6 个本章段落 id |
-| `anchor` | ✓ | 从 refs 段落逐字摘的短语(建议汉字 6~20 / 英文 3~8 词;校验放行汉字 4~30 / 英文 12~90 个字母数字,过长报错) |
+| `anchor` | ✓ | 从 refs 段落逐字摘的短语(建议汉字 6~20 / 英文 3~8 词;校验去掉标点空格后只数字母数字:汉字 4~30 / 英文 12~90,过长报错) |
 | `ev` | evidence/example 且 tier≤2 时必填 | `{type, strength, limit}`:type=data/study/case/anecdote/theory/analogy/authority;strength=strong/moderate/weak/illustrative/unclear |
 | `waive` | 可选 | 显式豁免的警告:`numbers` `overlap` `copy`;会被独立核对重点审 |
 
