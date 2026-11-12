@@ -1,0 +1,69 @@
+{
+ "short": {
+  "old_copy>=15": 3,
+  "new_copy>=15": 7,
+  "old_copy>=20": 0,
+  "new_copy>=20": 0,
+  "old_claims": 62,
+  "old_links": 87,
+  "new_claims": 52,
+  "new_anchor_overlap_median": 0.5671641791044776,
+  "new_low_overlap(<.12)": 0,
+  "new_reported": 4,
+  "old_ctrl_claims": [
+   [
+    "p2",
+    "V",
+    "流行的说法把组织变慢归咎于高层控制欲太强、不信任下属,所以才处处设卡。"
+   ],
+   [
+    "p3",
+    "V",
+    "作者认为控制欲解释是错的:多数添加流程的人并非控制狂,而是在事故之后做出了当时看"
+   ]
+  ],
+  "new_check_now": [
+   0,
+   2,
+   [
+    "导读篇幅为原书的 174.3%,超过建议上限 100%:删掉 weight 1 的细节命题、合并重复,导读不是复述",
+    "命题密度 9.5 条/千字,偏高:是不是把每段都改写了一遍?"
+   ]
+  ],
+  "new_misreadings": 7,
+  "new_critique": 5,
+  "new_quiz": 12
+ },
+ "long": {
+  "old_copy>=15": 2,
+  "new_copy>=15": 17,
+  "old_copy>=20": 0,
+  "new_copy>=20": 0,
+  "old_claims": 90,
+  "old_links": 132,
+  "new_claims": 150,
+  "new_anchor_overlap_median": 0.609375,
+  "new_low_overlap(<.12)": 0,
+  "new_reported": 11,
+  "old_ctrl_claims": [
+   [
+    "p1",
+    "E",
+    "作者十年间访谈的上百位中层几乎都在抱怨办事越来越难,并且多把原因归到上级控制欲太"
+   ],
+   [
+    "p4",
+    "E",
+    "一位态度温和的财务总监能说出每道签字因何事而加,她也想削减却一道都不敢动,这让作"
+   ]
+  ],
+  "new_check_now": [
+   0,
+   0,
+   []
+  ],
+  "new_misreadings": 6,
+  "new_critique": 5,
+  "new_quiz": 12
+ }
+}
