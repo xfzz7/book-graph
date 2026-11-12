@@ -1,0 +1,402 @@
+[
+ {
+  "id": "F01",
+  "verdict": "ok",
+  "note": ""
+ },
+ {
+  "id": "F02",
+  "verdict": "ok",
+  "note": ""
+ },
+ {
+  "id": "F03",
+  "verdict": "ok",
+  "note": ""
+ },
+ {
+  "id": "F04",
+  "verdict": "ok",
+  "note": ""
+ },
+ {
+  "id": "F05",
+  "verdict": "ok",
+  "note": ""
+ },
+ {
+  "id": "F06",
+  "verdict": "ok",
+  "note": ""
+ },
+ {
+  "id": "F07",
+  "verdict": "overstated",
+  "note": "书里只说大公司'可能'同时有更高利用率和更强波动、关系'未必是因果';陈述改成'往往一起偏高',把可能性说成常态。"
+ },
+ {
+  "id": "F08",
+  "verdict": "ok",
+  "note": ""
+ },
+ {
+  "id": "F09",
+  "verdict": "ok",
+  "note": ""
+ },
+ {
+  "id": "F10",
+  "verdict": "ok",
+  "note": ""
+ },
+ {
+  "id": "F11",
+  "verdict": "ok",
+  "note": ""
+ },
+ {
+  "id": "F12",
+  "verdict": "ok",
+  "note": ""
+ },
+ {
+  "id": "F13",
+  "verdict": "ok",
+  "note": ""
+ },
+ {
+  "id": "F14",
+  "verdict": "ok",
+  "note": ""
+ },
+ {
+  "id": "F15",
+  "verdict": "ok",
+  "note": ""
+ },
+ {
+  "id": "F16",
+  "verdict": "ok",
+  "note": ""
+ },
+ {
+  "id": "F17",
+  "verdict": "ok",
+  "note": ""
+ },
+ {
+  "id": "F18",
+  "verdict": "ok",
+  "note": ""
+ },
+ {
+  "id": "F19",
+  "verdict": "ok",
+  "note": ""
+ },
+ {
+  "id": "F20",
+  "verdict": "ok",
+  "note": ""
+ },
+ {
+  "id": "F21",
+  "verdict": "ok",
+  "note": ""
+ },
+ {
+  "id": "F22",
+  "verdict": "ok",
+  "note": ""
+ },
+ {
+  "id": "F23",
+  "verdict": "ok",
+  "note": ""
+ },
+ {
+  "id": "F24",
+  "verdict": "ok",
+  "note": ""
+ },
+ {
+  "id": "F25",
+  "verdict": "ok",
+  "note": ""
+ },
+ {
+  "id": "F26",
+  "verdict": "ok",
+  "note": ""
+ },
+ {
+  "id": "F27",
+  "verdict": "ok",
+  "note": ""
+ },
+ {
+  "id": "F28",
+  "verdict": "ok",
+  "note": ""
+ },
+ {
+  "id": "F29",
+  "verdict": "ok",
+  "note": ""
+ },
+ {
+  "id": "F30",
+  "verdict": "ok",
+  "note": ""
+ },
+ {
+  "id": "F31",
+  "verdict": "ok",
+  "note": ""
+ },
+ {
+  "id": "F32",
+  "verdict": "ok",
+  "note": ""
+ },
+ {
+  "id": "F33",
+  "verdict": "ok",
+  "note": ""
+ },
+ {
+  "id": "F34",
+  "verdict": "ok",
+  "note": ""
+ },
+ {
+  "id": "F35",
+  "verdict": "ok",
+  "note": ""
+ },
+ {
+  "id": "F36",
+  "verdict": "ok",
+  "note": ""
+ },
+ {
+  "id": "F37",
+  "verdict": "ok",
+  "note": ""
+ },
+ {
+  "id": "F38",
+  "verdict": "ok",
+  "note": ""
+ },
+ {
+  "id": "F39",
+  "verdict": "ok",
+  "note": ""
+ },
+ {
+  "id": "F40",
+  "verdict": "ok",
+  "note": ""
+ },
+ {
+  "id": "F41",
+  "verdict": "ok",
+  "note": ""
+ },
+ {
+  "id": "F42",
+  "verdict": "ok",
+  "note": ""
+ },
+ {
+  "id": "F43",
+  "verdict": "ok",
+  "note": ""
+ },
+ {
+  "id": "F44",
+  "verdict": "ok",
+  "note": ""
+ },
+ {
+  "id": "F45",
+  "verdict": "ok",
+  "note": ""
+ },
+ {
+  "id": "F46",
+  "verdict": "ok",
+  "note": ""
+ },
+ {
+  "id": "F47",
+  "verdict": "ok",
+  "note": ""
+ },
+ {
+  "id": "F48",
+  "verdict": "ok",
+  "note": ""
+ },
+ {
+  "id": "F49",
+  "verdict": "ok",
+  "note": ""
+ },
+ {
+  "id": "F50",
+  "verdict": "ok",
+  "note": ""
+ },
+ {
+  "id": "F51",
+  "verdict": "ok",
+  "note": ""
+ },
+ {
+  "id": "F52",
+  "verdict": "ok",
+  "note": ""
+ },
+ {
+  "id": "F53",
+  "verdict": "ok",
+  "note": ""
+ },
+ {
+  "id": "F54",
+  "verdict": "ok",
+  "note": ""
+ },
+ {
+  "id": "F55",
+  "verdict": "ok",
+  "note": ""
+ },
+ {
+  "id": "F56",
+  "verdict": "ok",
+  "note": ""
+ },
+ {
+  "id": "F57",
+  "verdict": "ok",
+  "note": ""
+ },
+ {
+  "id": "F58",
+  "verdict": "ok",
+  "note": ""
+ },
+ {
+  "id": "F59",
+  "verdict": "ok",
+  "note": ""
+ },
+ {
+  "id": "F60",
+  "verdict": "ok",
+  "note": ""
+ },
+ {
+  "id": "F61",
+  "verdict": "ok",
+  "note": ""
+ },
+ {
+  "id": "F62",
+  "verdict": "ok",
+  "note": ""
+ },
+ {
+  "id": "F63",
+  "verdict": "ok",
+  "note": ""
+ },
+ {
+  "id": "F64",
+  "verdict": "ok",
+  "note": ""
+ },
+ {
+  "id": "F65",
+  "verdict": "ok",
+  "note": ""
+ },
+ {
+  "id": "F66",
+  "verdict": "ok",
+  "note": ""
+ },
+ {
+  "id": "F67",
+  "verdict": "ok",
+  "note": ""
+ },
+ {
+  "id": "F68",
+  "verdict": "ok",
+  "note": ""
+ },
+ {
+  "id": "F69",
+  "verdict": "ok",
+  "note": ""
+ },
+ {
+  "id": "F70",
+  "verdict": "ok",
+  "note": ""
+ },
+ {
+  "id": "F71",
+  "verdict": "ok",
+  "note": ""
+ },
+ {
+  "id": "F72",
+  "verdict": "ok",
+  "note": ""
+ },
+ {
+  "id": "F73",
+  "verdict": "ok",
+  "note": ""
+ },
+ {
+  "id": "F74",
+  "verdict": "ok",
+  "note": ""
+ },
+ {
+  "id": "F75",
+  "verdict": "ok",
+  "note": ""
+ },
+ {
+  "id": "F76",
+  "verdict": "ok",
+  "note": ""
+ },
+ {
+  "id": "F77",
+  "verdict": "ok",
+  "note": ""
+ },
+ {
+  "id": "F78",
+  "verdict": "ok",
+  "note": ""
+ },
+ {
+  "id": "F79",
+  "verdict": "ok",
+  "note": ""
+ },
+ {
+  "id": "F80",
+  "verdict": "overstated",
+  "note": "书里说缓冲价值与波动程度'直接相关',波动越大需要越多,并没有说'成正比';且第七章还修正了这一点(临界线随变异系数变化)。"
+ }
+]
