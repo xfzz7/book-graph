@@ -41,7 +41,7 @@ SKIP_TITLE = re.compile(
 def _html_to_lines(raw: str) -> list[str]:
     raw = re.sub(r"<(script|style|head)[^>]*>.*?</\1>", "", raw, flags=re.S | re.I)
     raw = re.sub(r"<h([1-3])[^>]*>", "\n" + HEAD, raw, flags=re.I)
-    raw = re.sub(r"<br\s*/?>|</p>|</div>|</h[1-6]>|</li>|</tr>|</blockquote>|<p[ >]|<div[ >]", "\n", raw, flags=re.I)
+    raw = re.sub(r"<br\s*/?>|</p>|</div>|</h[1-6]>|</li>|</tr>|</blockquote>|<(?:p|div)\b[^>]*>", "\n", raw, flags=re.I)
     raw = re.sub(r"<[^>]+>", "", raw)
     raw = nfkc(html.unescape(raw)).replace(" ", " ")
     out = []

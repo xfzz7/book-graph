@@ -94,7 +94,7 @@ def context(src: Source, cid: str) -> str:
     else:
         out += ["(还没有 notes/brief.json——先做检视阅读)", ""]
     order = [c["id"] for c in src.active()]
-    prev = [c for c in order if c != cid and _load_note(src, c)]
+    prev = [c for c in order[:order.index(cid)] if _load_note(src, c)] if cid in order else []
     if prev:
         out.append("## 已读各章的主干(引用它们时用这些 id)")
         terms = []
