@@ -99,17 +99,20 @@ def plan(w: Work, issues, rate: float = 0.25, seed: int = 7, seeds: int = 6, ret
     musts: set[str] = set()
     for iid, it in cur.items():
         prev = log.get(iid)
-        if retry:
-            if prev and (prev["verdict"] != "ok" or prev.get("hash") != h(it["text"])):
-                picked.append(iid)
-            elif not prev and iid in flagged:
-                picked.append(iid)
-            continue
-        if prev and prev.get("hash") == h(it["text"]) and prev["verdict"] == "ok":
-            continue
         must = (it["kind"] == "card" and (it.get("tier") == 1 or it.get("waive") or it.get("voice") in ("other", "hedged")
                                            or (it.get("ckind") == "evidence")))
         must = must or it["kind"] in ("concept", "misreading", "critique") or iid in flagged
+        if retry:
+            if prev and (prev["verdict"] != "ok" or prev.get("hash") != h(it["text"])):
+                picked.append(iid)
+                if must:
+                    musts.add(iid)
+            elif not prev and must:  # 新增/改写后换了 id 的必审项
+                picked.append(iid)
+                musts.add(iid)
+            continue
+        if prev and prev.get("hash") == h(it["text"]) and prev["verdict"] == "ok":
+            continue
         if must:
             musts.add(iid)
         if must or rng.random() < rate:
@@ -168,7 +171,8 @@ def _render_entry(w: Work, iid: str, it: dict) -> str:
     lines = [f"## 条目 {iid}  〔{it['kind']}" + (f"/{it.get('ckind')}" if it.get("ckind") else "") + f"〕{stance}",
              f"待核对文本: {it['text']}", "原文段落(★ 为被引用的段落,其余为上下文):"]
     for pid, text, hit in _context(w, it["refs"]):
-        lines.append(f"{'★' if hit else ' '} [{pid}] {text}")
+        title = w.chapter(pid.split(":")[0])["title"]
+        lines.append(f"{'★' if hit else ' '} [{pid}·{title[:30]}] {text}")
     return "\n".join(lines)
 
 
