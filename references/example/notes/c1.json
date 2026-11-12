@@ -1,0 +1,19 @@
+{
+  "chapter": "c1",
+  "question": "计划为什么总是比预估拖得更久?",
+  "answer": "不是因为懒或不自律,而是估计的起点被锚定在一切顺利的情形上,事后调整又不够。",
+  "role": "problem",
+  "claims": [
+    {"id": "c1.1", "text": "通常的看法是:事情超期是因为人爱拖延、不够自律。", "kind": "objection", "voice": "reported", "weight": 2, "anchors": ["c1.p1"]},
+    {"id": "c1.2", "text": "作者统计了一家软件公司约三百个任务,发现自律程度高的工程师并不估得更准,平均都少估了约四成工期。", "kind": "evidence", "voice": "author", "weight": 2, "anchors": ["c1.p2"]},
+    {"id": "c1.3", "text": "低估的根源在估计的出发点:人们以顺利情形为基准,再加一点余量,而这点余量总是不够。", "kind": "mechanism", "voice": "author", "weight": 3, "anchors": ["c1.p3"]}
+  ],
+  "concepts": [
+    {"term": "顺境锚", "definition": "估计工期时以'一切顺利'的情形为出发点,之后的修正幅度不足。", "distinct_from": "不是拖延或懒惰,与个人是否自律无关。", "anchors": ["c1.p3"]}
+  ],
+  "links": [
+    {"from": "c1.2", "to": "c1.1", "rel": "rebuts", "note": "自律者同样低估,说明不是拖延问题"},
+    {"from": "c1.3", "to": "c1.2", "rel": "explains"}
+  ],
+  "threads": {"opens": ["既然起点错了,该从哪里起步估计?"], "closes": []}
+}

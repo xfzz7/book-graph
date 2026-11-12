@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>导读</title>
+<style>
+:root{--paper:#f6f2e9;--card:#fffdf8;--ink:#26221d;--mute:#776e62;--rule:#e2d9c6;--accent:#9c3f25;--blue:#35576a;--green:#55704a;--gold:#9a6c25;
+  --serif:"Source Han Serif SC","Noto Serif CJK SC","Songti SC","STSong",Georgia,serif;
+  --sans:-apple-system,"PingFang SC","Noto Sans CJK SC","Microsoft YaHei","Segoe UI",sans-serif}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);line-height:1.75}
+nav{position:fixed;top:0;left:0;bottom:0;width:210px;padding:28px 18px;border-right:1px solid var(--rule);overflow-y:auto;font-size:13.5px}
+nav .bk{font-family:var(--serif);font-weight:700;font-size:16px;line-height:1.4;margin-bottom:18px}
+nav a{display:block;color:var(--mute);text-decoration:none;padding:4px 0}
+nav a:hover,nav a.on{color:var(--accent)}
+main{margin-left:210px;max-width:860px;padding:40px 48px 120px}
+h1{font-family:var(--serif);font-size:34px;line-height:1.3;margin:0 0 6px}
+.by{color:var(--mute);margin-bottom:22px}
+.lead{font-family:var(--serif);font-size:20px;line-height:1.7;border-left:3px solid var(--accent);padding:4px 0 4px 18px;margin:0 0 34px}
+section{margin:0 0 54px}
+h2{font-family:var(--serif);font-size:23px;margin:0 0 18px;padding-bottom:8px;border-bottom:1px solid var(--rule)}
+h2 small{font-family:var(--sans);font-size:12px;color:var(--mute);font-weight:400;margin-left:10px;letter-spacing:.05em}
+h3{font-family:var(--serif);font-size:18px;margin:26px 0 8px}
+.qa{display:grid;grid-template-columns:110px 1fr;gap:10px 18px;margin-bottom:20px}
+.qa b{color:var(--mute);font-weight:600;font-size:13.5px;padding-top:2px}
+.qa div{font-family:var(--serif);font-size:16.5px}
+.ideas{counter-reset:k;list-style:none;padding:0;margin:0}
+.ideas li{background:var(--card);border:1px solid var(--rule);border-radius:10px;padding:14px 18px;margin-bottom:10px}
+.ideas li .t{font-family:var(--serif);font-weight:700;font-size:17px}
+.ideas li .x{font-size:14.5px;color:#4a433a;margin:2px 0 6px}
+.story{list-style:none;padding:0;margin:0;position:relative}
+.story li{position:relative;padding:0 0 18px 34px}
+.story li::before{content:attr(data-n);position:absolute;left:0;top:2px;width:22px;height:22px;border-radius:50%;background:var(--ink);color:#fff;font-size:12px;text-align:center;line-height:22px}
+.story li::after{content:"";position:absolute;left:10.5px;top:26px;bottom:2px;border-left:1.5px solid var(--rule)}
+.story li:last-child::after{display:none}
+.story .s{font-family:var(--serif);font-size:16px}
+.chips{display:flex;flex-wrap:wrap;gap:5px;margin-top:5px}
+.chip{font-size:11.5px;padding:1px 9px;border:1px solid var(--rule);border-radius:999px;background:var(--card);color:var(--mute);cursor:pointer;white-space:nowrap}
+.chip:hover{border-color:var(--accent);color:var(--accent)}
+.claim{padding:9px 12px;margin:0 -12px;border-radius:8px;cursor:pointer}
+.claim:hover{background:#efe8d8}
+.claim .k{display:inline-block;font-size:11px;padding:0 7px;border-radius:999px;color:#fff;margin-right:7px;vertical-align:1px}
+.claim .loc{font-size:11.5px;color:var(--mute);margin-left:6px;white-space:nowrap}
+.claim .rep{font-size:11.5px;color:var(--accent);margin-left:6px}
+.claim.w1{color:#5b544a;font-size:14px}
+.sub{font-size:12.5px;color:var(--mute);letter-spacing:.05em;margin:10px 0 2px}
+dl.gl dt{font-family:var(--serif);font-weight:700;font-size:16.5px;margin-top:16px}
+dl.gl dt .al{font-family:var(--sans);font-weight:400;font-size:12.5px;color:var(--mute);margin-left:8px}
+dl.gl dd{margin:2px 0 0}
+dl.gl .no{font-size:13.5px;color:var(--accent);margin-top:2px}
+.mis{display:grid;grid-template-columns:1fr 1fr;gap:0;border:1px solid var(--rule);border-radius:10px;overflow:hidden;margin-bottom:10px;background:var(--card)}
+.mis div{padding:12px 16px;font-size:14.5px}
+.mis .w{background:#f4e6df}.mis .w::before{content:"✗ ";color:var(--accent);font-weight:700}
+.mis .r::before{content:"✓ ";color:var(--green);font-weight:700}
+.chap{background:var(--card);border:1px solid var(--rule);border-radius:12px;padding:16px 22px;margin-bottom:14px}
+.chap summary{cursor:pointer;list-style:none;font-family:var(--serif);font-weight:700;font-size:17px}
+.chap summary::-webkit-details-marker{display:none}
+.chap summary .role{font-family:var(--sans);font-size:11.5px;font-weight:400;color:#fff;background:var(--blue);border-radius:999px;padding:1px 9px;margin-left:8px;vertical-align:2px}
+.chap .ca{font-family:var(--serif);font-size:15.5px;color:#3d372f;margin:6px 0 0}
+.chap .thr{font-size:13px;color:var(--mute);margin-top:8px}
+.lim h3{font-size:15px;font-family:var(--sans);color:var(--mute);font-weight:600}
+.lim li{margin-bottom:6px}
+.crit{border-left:3px solid var(--gold);padding-left:14px}
+.path{margin-bottom:8px}.path b{font-family:var(--serif)}
+.quiz li{margin-bottom:14px}
+.quiz .qt{font-size:11px;color:#fff;background:var(--gold);border-radius:999px;padding:0 7px;margin-right:6px}
+.quiz button{font:inherit;font-size:12px;border:1px solid var(--rule);background:var(--card);border-radius:999px;padding:1px 11px;margin-left:6px;cursor:pointer;color:var(--mute)}
+.quiz .an{display:none;margin-top:6px;padding:8px 12px;background:var(--card);border-radius:8px;border:1px dashed var(--rule);font-size:14.5px}
+.quiz .an.show{display:block}
+#panel{position:fixed;top:0;right:0;bottom:0;width:390px;background:var(--card);border-left:1px solid var(--rule);box-shadow:-20px 0 40px -30px rgba(50,30,10,.5);transform:translateX(105%);transition:transform .2s;overflow-y:auto;padding:30px 24px 60px;z-index:9}
+#panel.show{transform:none}
+#panel .x{position:absolute;top:10px;right:14px;border:0;background:none;font-size:22px;color:var(--mute);cursor:pointer}
+#panel .pt{font-family:var(--serif);font-size:17px;line-height:1.75;margin:10px 0}
+#panel h4{font-size:12px;color:var(--mute);letter-spacing:.1em;margin:20px 0 6px;border-top:1px solid var(--rule);padding-top:12px}
+.rel{padding:7px 9px;margin:0 -9px;border-radius:8px;cursor:pointer;font-size:13.5px}
+.rel:hover{background:#efe8d8}
+.rel i{font-style:normal;color:var(--accent);font-size:12px;margin-right:6px}
+.foot{font-size:12.5px;color:var(--mute);border-top:1px solid var(--rule);padding-top:12px}
+@media(max-width:900px){nav{display:none}main{margin-left:0;padding:26px 20px 90px}#panel{width:100%}.mis{grid-template-columns:1fr}.qa{grid-template-columns:1fr}}
+@media print{nav,#panel,.quiz button{display:none}main{margin:0}.quiz .an{display:block}}
+</style>
+</head>
+<body>
+<nav id="nav"></nav>
+<main id="main"></main>
+<aside id="panel"><button class="x" onclick="closeP()">×</button><div id="pin"></div></aside>
+<script>
+const G=/*DATA*/null/*END*/;
+const S=G.S,T=G.T,Lb=G.L,C=G.claims,LAB=G.labels;
+const KC={claim:'#9c3f25',mechanism:'#35576a',method:'#55704a',evidence:'#9a6c25',definition:'#6b5a86',concession:'#8a8378',objection:'#5c5c5c'};
+const esc=s=>String(s??'').replace(/[&<>"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]));
+const loc=a=>{const m=/^(c\d+)\.p(\d+)(?:-p?(\d+))?$/.exec(a);return m?`${LAB[m[1]]||m[1]} ${Lb.para}${m[2]}${m[3]?'–'+m[3]:''}`:a};
+const locs=xs=>(xs||[]).map(loc).join('、');
+document.title=`《${G.title}》${T.guide}`;
+const sections=[];
+function sec(id,title,html,sub){sections.push([id,title]);return `<section id="${id}"><h2>${esc(title)}${sub?`<small>${esc(sub)}</small>`:''}</h2>${html}</section>`}
+function claimRow(id){const c=C[id];if(!c)return '';
+  return `<div class="claim w${c.weight||1}" data-c="${id}"><span class="k" style="background:${KC[c.kind]||'#888'}">${esc(Lb.kind[c.kind]||c.kind)}</span>${esc(c.text)}${c.voice==='reported'?`<span class="rep">${esc(T.reported)}</span>`:''}<span class="loc">${esc(locs(c.anchors))}</span></div>`}
+const chipsFor=ids=>{const chs=[...new Set((ids||[]).map(x=>x.split('.')[0]))].sort((a,b)=>a.slice(1)-b.slice(1));return `<div class="chips">${chs.map(c=>`<span class="chip" data-go="ch-${c}">${esc(LAB[c]||c)}</span>`).join('')}</div>`};
+let h=`<h1>《${esc(G.title)}》${esc(T.guide)}</h1><div class="by">${esc(G.author)}</div><p class="lead">${esc(S.one_liner)}</p>`;
+// 1 一页纸
+h+=sec('page',T.page,`<div class="qa"><b>${esc(T.q)}</b><div>${esc(S.question)}</div><b>${esc(T.a)}</b><div>${esc(S.answer)}</div>${S.why_read?`<b>${esc(T.why)}</b><div>${esc(S.why_read)}</div>`:''}</div>
+<ol class="ideas">${S.key_ideas.map(k=>`<li><div class="t">${esc(k.id||'')} ${esc(k.title)}</div><div class="x">${esc(k.text)}</div><span class="chip" data-go="ki-${esc(k.id)}">${esc(T.support)} / ${esc(T.evid)} →</span></li>`).join('')}</ol>`);
+// 2 主线
+h+=sec('story',T.story,`<ol class="story">${S.storyline.map((s,i)=>`<li data-n="${i+1}"><div class="s">${esc(s.step)}</div>${chipsFor(s.claims)}</li>`).join('')}</ol>`);
+// 3 关键思想
+h+=sec('ideas',T.ideas,S.key_ideas.map(k=>`<div id="ki-${esc(k.id)}"><h3>${esc(k.id||'')} ${esc(k.title)}</h3><p>${esc(k.text)}</p>${(k.because||[]).length?`<div class="sub">${esc(T.support)}</div>${k.because.map(claimRow).join('')}`:''}${(k.evidence||[]).length?`<div class="sub">${esc(T.evid)}</div>${k.evidence.map(claimRow).join('')}`:''}</div>`).join(''));
+// 4 概念
+h+=sec('gloss',T.gloss,`<dl class="gl">${S.glossary.map(g=>`<dt>${esc(g.term)}${(g.aliases||[]).length?`<span class="al">${esc(g.aliases.join(' / '))}</span>`:''}${(g.chapters||[]).length?`<span class="al">${esc(g.chapters.map(c=>LAB[c]||c).join('、'))}</span>`:''}</dt><dd>${esc(g.definition)}${g.distinct_from?`<div class="no">${esc(T.notthis)}:${esc(g.distinct_from)}</div>`:''}</dd>`).join('')}</dl>`);
+// 5 误读
+if((S.misreadings||[]).length)h+=sec('mis',T.mis,S.misreadings.map(m=>`<div class="mis"><div class="w">${esc(m.wrong)}</div><div class="r">${esc(m.right)}${m.anchors&&m.anchors.length?`<span class="claim"><span class="loc">${esc(locs(m.anchors))}</span></span>`:''}</div></div>`).join(''));
+// 6 逐章
+h+=sec('chap',T.chap,G.chapters.map(ch=>{const th=ch.threads||{};const cls=[...ch.claims].sort((a,b)=>(b.weight||1)-(a.weight||1));
+  return `<details class="chap" id="ch-${ch.id}"><summary>${esc(ch.title)}<span class="role">${esc(Lb.role[ch.role]||ch.role||'')}</span><div class="ca"><b>${esc(T.ch_q)}</b>:${esc(ch.question)}<br><b>${esc(T.ch_a)}</b>:${esc(ch.answer)}</div></summary>
+  <div style="margin-top:10px">${cls.map(c=>claimRow(c.id)).join('')}</div>
+  ${(th.closes||[]).length?`<div class="thr">↩ ${esc(T.closes)}:${esc(th.closes.map(x=>typeof x==='string'?x:x.what).join(';'))}</div>`:''}
+  ${(th.opens||[]).length?`<div class="thr">↪ ${esc(T.opens)}:${esc(th.opens.join(';'))}</div>`:''}</details>`}).join(''),'点开查看每章的全部命题;点命题看它与别处的关系');
+// 7 局限
+const lim=S.limits||{};
+h+=sec('lim',T.limits,`<div class="lim">${(lim.author_admits||[]).length?`<h3>${esc(T.admits)}</h3><ul>${lim.author_admits.map(x=>`<li>${esc(x.text)} <span class="claim"><span class="loc">${esc(locs(x.anchors))}</span></span></li>`).join('')}</ul>`:''}
+${(lim.critique||[]).length?`<h3>${esc(T.critique)}</h3><ul class="crit">${lim.critique.map(x=>`<li>${esc(x.text)}</li>`).join('')}</ul>`:''}</div>`);
+// 8 路线
+if((S.reading_paths||[]).length)h+=sec('paths',T.paths,S.reading_paths.map(p=>`<div class="path"><b>${esc(p.goal)}</b>:${esc((p.chapters||[]).map(c=>LAB[c]||c).join(' → '))}${p.note?`<div style="font-size:13.5px;color:var(--mute)">${esc(p.note)}</div>`:''}</div>`).join(''));
+// 9 自测
+h+=sec('quiz',T.quiz,`<ol class="quiz">${S.quiz.map((q,i)=>`<li><span class="qt">${esc(Lb.qtype[q.type]||q.type)}</span>${esc(q.q)}<button data-a="${i}">${esc(T.ans)}</button><div class="an" id="an${i}">${esc(q.answer)} <span class="claim"><span class="loc">${esc(locs(q.anchors))}</span></span></div></li>`).join('')}</ol>`,'先自己回答,再看答案');
+h+=`<p class="foot">${esc(T.loc_note)}</p>`;
+document.getElementById('main').innerHTML=h;
+document.getElementById('nav').innerHTML=`<div class="bk">《${esc(G.title)}》</div>`+sections.map(([id,t])=>`<a href="#${id}">${esc(t)}</a>`).join('');
+// 交互
+const out={},inn={};G.links.forEach(l=>{(out[l.from]=out[l.from]||[]).push(l);(inn[l.to]=inn[l.to]||[]).push(l)});
+const usedIn=id=>S.key_ideas.filter(k=>(k.because||[]).concat(k.evidence||[]).includes(id)).map(k=>`${k.id} ${k.title}`);
+function openClaim(id){const c=C[id];if(!c)return;const ch=G.chapters.find(x=>x.id===id.split('.')[0]);
+  const rel=(l,other,dir)=>`<div class="rel" data-c="${other}"><i>${dir==='out'?'→ '+esc(Lb.rel[l.rel]||l.rel):'← '+esc(Lb.rel[l.rel]||l.rel)}</i>${esc(C[other]?C[other].text:other)}${l.note?`<div style="font-size:12px;color:var(--mute)">${esc(l.note)}</div>`:''}</div>`;
+  const o=(out[id]||[]).map(l=>rel(l,l.to,'out')).join(''),n=(inn[id]||[]).map(l=>rel(l,l.from,'in')).join('');
+  const u=usedIn(id);
+  document.getElementById('pin').innerHTML=`<div style="font-size:12px;color:var(--mute)">${esc(ch?ch.title:'')} · ${esc(Lb.kind[c.kind]||c.kind)} · ${esc(locs(c.anchors))}</div><div class="pt">${esc(c.text)}</div>${c.voice==='reported'?`<div class="rep" style="color:var(--accent);font-size:13px">${esc(T.reported)}</div>`:''}${o||n?`<h4>${esc(T.links)}</h4>${o}${n}`:''}${u.length?`<h4>${esc(T.ideas)}</h4>${u.map(esc).join('<br>')}`:''}`;
+  document.getElementById('panel').classList.add('show')}
+function closeP(){document.getElementById('panel').classList.remove('show')}
+document.addEventListener('click',e=>{const c=e.target.closest('[data-c]');if(c){openClaim(c.dataset.c);return}
+  const g=e.target.closest('[data-go]');if(g){const t=document.getElementById(g.dataset.go);if(t){if(t.tagName==='DETAILS')t.open=true;t.scrollIntoView({behavior:'smooth',block:'start'})}return}
+  const b=e.target.closest('button[data-a]');if(b){document.getElementById('an'+b.dataset.a).classList.toggle('show')}});
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeP()});
+</script>
+</body>
+</html>

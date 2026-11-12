@@ -1,0 +1,13 @@
+{
+  "chapter": "c3",
+  "question": "参照估计在什么情况下不管用?",
+  "answer": "对前所未有的工作无效;且作者的数据只来自一家公司,不宜推广。",
+  "role": "limits",
+  "claims": [
+    {"id": "c3.1", "text": "参照估计只适合重复性工作;全新的任务没有过去可参照,顺境锚仍会生效。", "kind": "concession", "voice": "author", "weight": 3, "anchors": ["c3.p1"]},
+    {"id": "c3.2", "text": "作者提醒,数据只来自一家公司,四成低估这个数字不应被当作普遍规律。", "kind": "concession", "voice": "author", "weight": 2, "anchors": ["c3.p2"]}
+  ],
+  "concepts": [],
+  "links": [],
+  "threads": {"opens": [], "closes": []}
+}

@@ -1,0 +1,19 @@
+{
+  "chapter": "c2",
+  "question": "怎样估计才能避开顺境锚?",
+  "answer": "换一个起点:用过去类似任务的实际耗时作为基准(参照估计)。",
+  "role": "solution",
+  "claims": [
+    {"id": "c2.1", "text": "与其凭空设想一件事需要多久,不如先查以往相似工作真正耗费了多少时间,以此作为估计的出发点。", "kind": "method", "voice": "author", "weight": 3, "anchors": ["c2.p1"]},
+    {"id": "c2.2", "text": "两个小组试行参照估计三个月后,平均低估幅度由约四成降到约一成半。", "kind": "evidence", "voice": "author", "weight": 2, "anchors": ["c2.p2"]},
+    {"id": "c2.3", "text": "参照估计的前提是平时记下实际耗时,而多数人没有这个习惯。", "kind": "concession", "voice": "author", "weight": 1, "anchors": ["c2.p3"]}
+  ],
+  "concepts": [
+    {"term": "参照估计", "definition": "以过去类似任务的实际耗时为起点来估计新任务。", "distinct_from": "不是在直觉估计上多加缓冲。", "anchors": ["c2.p1"]}
+  ],
+  "links": [
+    {"from": "c2.2", "to": "c2.1", "rel": "supports"},
+    {"from": "c2.1", "to": "c2.3", "rel": "requires"}
+  ],
+  "threads": {"opens": [], "closes": ["回答了第一章'该从哪里起步估计'的问题"]}
+}
