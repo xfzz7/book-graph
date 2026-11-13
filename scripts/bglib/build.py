@@ -77,7 +77,10 @@ def assemble(src: Source, notes: dict, book: dict, issues, audit: dict) -> dict:
                  "abstract": book.get("abstract", ""), "book_type": book.get("book_type", ""),
                  "pillars": pillars, "concepts": concepts,
                  "critique": book.get("critique") or [], "questions": book.get("questions") or [],
-                 "takeaways": book.get("takeaways") or []},
+                 "takeaways": book.get("takeaways") or [],
+                 "thesis_claims": [k for k in book.get("thesis_claims") or [] if k in claims],
+                 "aside": [{"claims": [k for k in a.get("claims") or [] if k in claims], "why": a.get("why", "")}
+                           for a in book.get("aside") or [] if isinstance(a, dict)]},
         "chapters": chapters, "links": links,
     }
 

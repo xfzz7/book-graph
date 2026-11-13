@@ -191,7 +191,11 @@ def audit_packet(src: Source, n: int = 30, seed: int = 7, renew: bool = False) -
     verdicts = []
     if isinstance(book, dict) and (renew or not old):
         lines += ["## A. 全书层面", "", f"### thesis", f"核心论点:{book.get('thesis', '')}", f"核心问题:{book.get('question', '')}",
-                  "核对依据:请完整阅读序言/导论与结语所在的 source 文件,判断这是否是**作者自己**的中心主张。", ""]
+                  "核对依据:请完整阅读序言/导论与结语所在的 source 文件,判断这是否是**作者自己**的中心主张。"]
+        for k in book.get("thesis_claims") or []:
+            if k in claims:
+                lines.append(f"- 笔记称作者在此处直接表述了论点({k}):{claims[k].get('text')}  出处 {','.join(claims[k].get('refs') or [])}")
+        lines.append("")
         verdicts.append({"id": "thesis", "hash": text_hash(book.get("thesis", "")), "verdict": "", "note": ""})
         for p in book.get("pillars") or []:
             if not isinstance(p, dict):

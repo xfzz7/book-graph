@@ -251,6 +251,28 @@ class TestMutations(unittest.TestCase):
             self.assertTrue(any("靶子" in m for _, _, m in iss.errors))
             self.assertTrue(has(iss.warnings, "book", "层次单一"))
 
+    def test_term_enumeration_is_not_copying(self):
+        with Work() as w:
+            # 原文里并列出现的两个术语,按原顺序罗列 + 原文措辞,未登记时会撞线,登记为概念后不算抄录
+            def f(d):
+                claim(d, "c03-k2").update(text="关键在于区分两种专注。被迫的专注要不断压制想逃开的冲动。")
+            w.edit("notes/c03.json", f)
+            self.assertTrue(has(w.check()[0].errors, "c03-k2", "连续"))
+            w.edit("notes/c03.json", lambda d: claim(d, "c03-k2").update(text="作者把专注分成自发的专注与被迫的专注,前者不耗神,后者耗神。"))
+            self.assertFalse(has(w.check()[0].errors, "c03-k2", "连续"))
+
+    def test_single_char_numeral_no_false_alarm(self):
+        self.assertIn("10", textutil.number_forms("十票赞成、一票反对"))
+
+    def test_thesis_claims_and_aside_exempt(self):
+        with Work() as w:
+            w.edit("book.json", lambda d: d["pillars"].pop())
+            self.assertTrue(has(w.check()[0].warnings, "book", "没有连到任何支柱"))
+            w.edit("book.json", lambda d: d.update(thesis_claims=["c04-k1"], aside=[{"claims": ["c04-k2"], "why": "测试"}]))
+            self.assertFalse(has(w.check()[0].warnings, "book", "没有连到任何支柱"))
+            w.edit("book.json", lambda d: d.update(aside=[{"claims": ["c04-k9"], "why": "x"}]))
+            self.assertTrue(any("c04-k9" in m for _, _, m in w.check()[0].errors))
+
     def test_coverage_gap(self):
         tmp = Path(tempfile.mkdtemp())
         try:

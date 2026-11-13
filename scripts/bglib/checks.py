@@ -28,7 +28,7 @@ VERDICTS = {"ok", "distorted", "unsupported", "misattributed"}
 COPY_N = {"zh": 13, "en": 8}     # 与原文连续相同达到这个长度(汉字数 / 英文词数)即视为抄录
 QUOTE_MAX = 30                    # 定位片段上限(单位:汉字或英文词)
 QUOTE_MIN = 4
-QUOTE_BUDGET = 0.03               # 全部定位片段合计不超过原书的 3%
+QUOTE_BUDGET = 0.05               # 全部定位片段合计不超过原书的 5%
 
 
 class Issues:
@@ -95,10 +95,29 @@ class ChapterCtx:
         return cls._cache[key]
 
 
-def _check_copy(iss: Issues, where: str, text: str, ctx: ChapterCtx, field: str):
-    run, seg = longest_shared_run(text, ctx.grams, ctx.n)
+def mask_terms(text: str, terms) -> str:
+    """把已登记的概念术语换成分隔符:术语本身(以及按原顺序罗列术语)不算抄录。"""
+    for t in sorted((t for t in terms if t and len(t) >= 2), key=len, reverse=True):
+        text = text.replace(t, " \u2016 ")
+    return text
+
+
+def terms_of(note: dict) -> set[str]:
+    out = set()
+    for cp in (note or {}).get("concepts") or []:
+        if isinstance(cp, dict):
+            out.add(str(cp.get("term") or ""))
+            out.update(str(a) for a in cp.get("aka") or [])
+    return out
+
+
+def _check_copy(iss: Issues, where: str, text: str, ctx: ChapterCtx, field: str, terms=()):
+    run, seg = longest_shared_run(mask_terms(text, terms), ctx.grams, ctx.n)
     if run:
-        iss.e(where, f"{field} 与原文连续 {run} 个字/词相同:「{seg[:40]}」。产出物必须转述,请换自己的话重写(专有名词和术语可以保留)。")
+        ns = norm(seg)
+        at = next((pid for pid, t in ctx.norm.items() if ns in t), None)
+        iss.e(where, f"{field} 与原文{f'({at})' if at else ''}连续 {run} 个字/词相同:「{seg[:40]}」。产出物必须转述,请换自己的话重写"
+                     "(已登记在 concepts 里的术语不计入;其余请调整语序或换词)。")
 
 
 def _check_refs(iss: Issues, where: str, refs, cid: str, ctx: ChapterCtx, max_refs: int = 6) -> list[str]:
@@ -128,6 +147,7 @@ def check_chapter(src: Source, cid: str, note: dict, iss: Issues, known_claims: 
         return
     if note.get("chapter") != cid:
         iss.e(cid, f"chapter 字段应为 {cid!r},实际是 {note.get('chapter')!r}。")
+    terms = terms_of(note)
     for f, lim in (("role", 80), ("summary", 260)):
         v = note.get(f)
         if not isinstance(v, str) or units(v) < 8:
@@ -135,7 +155,7 @@ def check_chapter(src: Source, cid: str, note: dict, iss: Issues, known_claims: 
         else:
             if units(v) > lim:
                 iss.w(cid, f"{f} 有 {units(v)} 字,超过建议的 {lim}。它是给读者的浓缩,不是复述。")
-            _check_copy(iss, cid, v, ctx, f)
+            _check_copy(iss, cid, v, ctx, f, terms)
 
     claims = note.get("claims")
     if not isinstance(claims, list) or not claims:
@@ -168,10 +188,12 @@ def check_chapter(src: Source, cid: str, note: dict, iss: Issues, known_claims: 
         refs = _check_refs(iss, k, c.get("refs"), cid, ctx)
         covered.update(refs)
         if text:
-            _check_copy(iss, k, text, ctx, "text")
+            _check_copy(iss, k, text, ctx, "text", terms)
         # 定位片段:必须逐字出现在所引段落里
         q = c.get("quote")
-        if not isinstance(q, str) or units(q) < QUOTE_MIN:
+        if isinstance(q, str) and 0 < units(q) < QUOTE_MIN:
+            iss.e(k, f"quote 只有 {units(q)} 字,太短(至少 {QUOTE_MIN} 字),在书里搜不出唯一位置。")
+        elif not isinstance(q, str) or not q:
             iss.e(k, f"缺少 quote:从所引段落里逐字摘一个 {QUOTE_MIN}–{QUOTE_MAX} 字的片段,供读者在自己的书里搜索定位,也供机器核对锚点。")
         else:
             if units(q) > QUOTE_MAX:
@@ -253,7 +275,7 @@ def check_chapter(src: Source, cid: str, note: dict, iss: Issues, known_claims: 
             iss.e(w, "概念需要 term 和 def(作者在本章的用法,转述)。")
             continue
         covered.update(_check_refs(iss, w, cp.get("refs"), cid, ctx))
-        _check_copy(iss, w, cp["def"], ctx, "def")
+        _check_copy(iss, w, cp["def"], ctx, "def", terms)
 
     # 明确跳过的范围
     for i, sk in enumerate(note.get("skipped") or []):
@@ -282,7 +304,11 @@ def check_chapter(src: Source, cid: str, note: dict, iss: Issues, known_claims: 
         if best > max(2200, 0.3 * total) and best_rng:
             iss.w(cid, f"{best_rng[0]} 到 {best_rng[1]}(约占本章 {best * 100 // total}%)没有任何笔记引用。"
                        "长章最常见的失误是只记了开头和结尾。请重读这一段:有论点就补笔记;确实只是铺垫/重复,就在 skipped 里写明范围和原因。")
-        lo, hi = max(3, total // 2400), max(12, total // 300)
+        qsum = sum(units(c.get("quote") or "") for c in seen.values())
+        csum = max(1, units(" ".join(ctx.paras.values())))
+        if csum > 2000 and qsum / csum > QUOTE_BUDGET * 1.2:
+            iss.w(cid, f"本章定位片段合计占原文 {qsum * 100 / csum:.1f}%(全书预算 {QUOTE_BUDGET * 100:.0f}%)。quote 通常 6–15 字就够定位,请缩短。")
+        lo, hi = max(3, total // 2400), max(14, total // 200)
         if len(seen) < lo:
             iss.w(cid, f"本章约 {ch['chars']} 字,只有 {len(seen)} 条笔记,偏稀(参考下限 {lo})。检查是否漏了理由、证据或限定。")
         if len(seen) > hi:
@@ -318,7 +344,13 @@ def all_links(notes: dict[str, dict], book: dict | None) -> list[dict]:
         out.extend(l for l in (n.get("links") or []) if isinstance(l, dict))
     if book:
         out.extend(l for l in (book.get("links") or []) if isinstance(l, dict))
-    return out
+    seen, uniq = set(), []
+    for l in out:
+        key = (l.get("from"), l.get("to"), l.get("type"))
+        if key not in seen:
+            seen.add(key)
+            uniq.append(l)
+    return uniq
 
 
 def reach_pillars(claims: dict, links: list[dict], book: dict) -> dict[str, set[str]]:
@@ -419,15 +451,33 @@ def check_book(src: Source, notes: dict[str, dict], book: dict, iss: Issues) -> 
     # 主干是否都进了全书论证
     if pids:
         reach = reach_pillars(claims, links, book)
-        loose = [k for k, c in claims.items() if c.get("weight") == "core" and c.get("kind") != "counter" and not reach[k]]
+        exempt = set(book.get("thesis_claims") or [])
+        for a in book.get("aside") or []:
+            if isinstance(a, dict):
+                exempt.update(a.get("claims") or [])
+        loose = [k for k, c in claims.items() if c.get("weight") == "core" and c.get("kind") != "counter"
+                 and not reach[k] and k not in exempt]
         if loose:
             iss.w(W, f"{len(loose)} 条 core 命题没有连到任何支柱:{'、'.join(loose[:12])}{'…' if len(loose) > 12 else ''}。"
-                     "要么把它们挂进某个支柱(直接列入 claims,或用 links 连到已在支柱里的命题),要么承认它们不是主干、降级。")
+                     "处理办法:①属于某根支柱的,直接列入该支柱的 claims,或用 supports/refines/causes/limits 连到支柱里的命题"
+                     "(requires/applies 表示论证间的依赖,不算归属);②它本身就是全书论点的表述(常见于序言、结语),列入 thesis_claims;"
+                     "③背景、题外话等不承担论证的,列入 aside 并写 why。")
         if len(notes) >= 4:
             ch_in = {claims[k]["chapter"] for k, r in reach.items() if r}
             out = [c for c in notes if c not in ch_in]
             if len(out) > len(notes) / 3:
                 iss.w(W, f"有 {len(out)} 章({'、'.join(out[:8])})没有任何命题进入支柱。支柱可能只概括了书的一部分。")
+
+    for k in book.get("thesis_claims") or []:
+        if k not in claims:
+            iss.e(W, f"thesis_claims 里的 {k!r} 不存在。")
+    for i, a in enumerate(book.get("aside") or []):
+        if not isinstance(a, dict) or not a.get("why") or not isinstance(a.get("claims"), list):
+            iss.e(f"book#aside[{i}]", "aside 需要 claims(命题 id 列表)和 why。")
+        else:
+            for k in a["claims"]:
+                if k not in claims:
+                    iss.e(f"book#aside[{i}]", f"{k!r} 不存在。")
 
     # 阅读建议
     guide = {g.get("id"): g for g in (book.get("chapters") or []) if isinstance(g, dict)}
@@ -510,11 +560,14 @@ def check_book(src: Source, notes: dict[str, dict], book: dict, iss: Issues) -> 
     fields += [(f"{p.get('id')}.statement", p.get("statement")) for p in pillars if isinstance(p, dict)]
     fields += [(f"concepts[{i}].def", c.get("def")) for i, c in enumerate(book.get("concepts") or []) if isinstance(c, dict)]
     fields += [(f"questions[{i}].a", q.get("a")) for i, q in enumerate(qs) if isinstance(q, dict)]
+    bterms = terms_of(book)
+    for n in notes.values():
+        bterms |= terms_of(n)
     for cid in notes:
         ctx = ChapterCtx.get(src, cid)
         for name, v in fields:
             if isinstance(v, str) and v:
-                run, seg = longest_shared_run(v, ctx.grams, ctx.n)
+                run, seg = longest_shared_run(mask_terms(v, bterms), ctx.grams, ctx.n)
                 if run:
                     iss.e(W, f"{name} 与 {cid} 原文连续 {run} 个字/词相同:「{seg[:40]}」。请转述。")
 
@@ -522,7 +575,7 @@ def check_book(src: Source, notes: dict[str, dict], book: dict, iss: Issues) -> 
     qtot = sum(units(c.get("quote") or "") for c in claims.values())
     btot = max(1, sum(units(" ".join(src.paras(c["id"]).values())) for c in src.active())) if claims else 1
     if btot > 20000 and qtot / btot > QUOTE_BUDGET:
-        iss.w(W, f"定位片段合计占原书 {qtot * 100 / btot:.1f}%,超过 {QUOTE_BUDGET * 100:.0f}%。把 quote 缩短到刚好能搜索定位的长度。")
+        iss.w(W, f"定位片段合计占原书 {qtot * 100 / btot:.2f}%,超过 {QUOTE_BUDGET * 100:.0f}%。把 quote 缩短到刚好能搜索定位的长度。")
 
 
 # ---------------------------------------------------------------- 审计

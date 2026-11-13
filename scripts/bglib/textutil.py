@@ -141,4 +141,8 @@ def numbers(s: str) -> set[str]:
 def number_forms(s: str) -> set[str]:
     """原文一侧的宽松集合:37% 同时算作出现了 37。"""
     ns = numbers(s)
+    s = nfkc(s)
+    for ch, v in (("十", "10"), ("百", "100"), ("千", "1000"), ("万", "10000")):
+        if ch in s:                      # 单个"十/百/千/万":原文一侧从宽
+            ns.add(v)
     return ns | {n[:-1] for n in ns if n.endswith("%")}

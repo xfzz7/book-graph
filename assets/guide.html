@@ -175,16 +175,19 @@ function desc(id,seen=new Set()){(kids[id]||[]).forEach(k=>{if(!seen.has(k.id)){
 function topClaims(p){const out=[];p.claims.forEach(id=>{if(!out.some(o=>desc(o).has(id)))out.push(id)});return out.filter(id=>!out.some(o=>o!==id&&desc(o).has(id)))}
 function renderArgument(){
   const inPillar=new Set(Object.values(C).filter(c=>c.pillars.length).map(c=>c.id));
-  const loose=Object.values(C).filter(c=>c.weight==='core'&&!c.pillars.length);
+  const tc=B.thesis_claims||[],asideIds=new Set((B.aside||[]).flatMap(a=>a.claims));
+  const loose=Object.values(C).filter(c=>c.weight==='core'&&c.kind!=='counter'&&!c.pillars.length&&!tc.includes(c.id)&&!asideIds.has(c.id));
   const pil=B.pillars.map(p=>`<li class="node root" data-pillar="${p.id}" id="pil-${p.id}"><div class="nrow"><span class="tw">▾</span><span class="ntext"><span class="pid">${p.id}</span><b>${esc(p.title)}</b>:${esc(p.statement)}
     ${p.depends_on.length?`<span class="chtag">以 ${p.depends_on.join('、')} 为前提</span>`:''}</span></div>
     <ul>${topClaims(p).map(id=>nodeHTML(id,'',new Set(),0)).join('')}</ul></li>`).join('');
   $('#s-argument').innerHTML=`
-  <div class="card"><div class="lead">核心论点</div><div class="thesis" style="font-size:19px">${esc(B.thesis)}</div></div>
+  <div class="card"><div class="lead">核心论点</div><div class="thesis" style="font-size:19px">${esc(B.thesis)}</div>
+  ${tc.length?`<div class="sm mut" style="margin-top:10px">作者自己在书中这样表述(点开看出处):</div>${tc.map(id=>C[id]?`<div class="claim" data-claim="${id}">${kindPill(C[id])}${esc(C[id].text)} <span class="chtag">${esc(chShort(C[id].ch))}</span></div>`:'').join('')}`:''}</div>
   <div class="tools">展开到 <span class="seg"><button data-d="pillar">支柱</button><button data-d="core">主干+支撑</button><button data-d="all">全部细节</button></span>
   <span class="hint">每个支柱下面是撑起它的各章主干;再往下是各主干的理由、证据、限定和被反驳的对手观点。点任意一条看出处与关联。</span></div>
   <div class="tree"><ul>${pil}</ul></div>
   ${loose.length?`<h2>没有归入支柱的主干 <small>各章里重要、但不直接承担全书论证的内容</small></h2><div class="tree"><ul>${loose.map(c=>nodeHTML(c.id,'',new Set(),1)).join('')}</ul></div>`:''}
+  ${(B.aside||[]).filter(a=>a.claims.length).map(a=>`<h2>论证之外 <small>${esc(a.why)}</small></h2><div class="tree"><ul>${a.claims.map(id=>nodeHTML(id,'',new Set(),1)).join('')}</ul></div>`).join('')}
   <p class="sm mut" style="margin-top:18px">图例:${Object.keys(L.kind).map(k=>`<span class="pill k-${k}">${L.kind[k]}</span>`).join('')} 其中「对手观点」是作者引述并<b>反对</b>的说法,不是作者的主张。</p>`;
   $$('#s-argument .seg button').forEach(b=>{b.classList.toggle('on',b.dataset.d===treeDepth);b.onclick=()=>{treeDepth=b.dataset.d;store.set('depth',treeDepth);renderArgument()}});
   if(treeDepth==='pillar')$$('#s-argument .root').forEach(n=>{n.classList.add('closed');$('.tw',n).textContent='▸'});
