@@ -1,0 +1,254 @@
+[
+ {
+  "id": "thesis",
+  "hash": "b0a1ce6a40",
+  "verdict": "ok",
+  "note": ""
+ },
+ {
+  "id": "P1",
+  "hash": "00fc243841",
+  "verdict": "ok",
+  "note": ""
+ },
+ {
+  "id": "P2",
+  "hash": "037bb08bc2",
+  "verdict": "ok",
+  "note": ""
+ },
+ {
+  "id": "P3",
+  "hash": "7331acc1a8",
+  "verdict": "ok",
+  "note": ""
+ },
+ {
+  "id": "P4",
+  "hash": "d7e90d9ce4",
+  "verdict": "ok",
+  "note": ""
+ },
+ {
+  "id": "P5",
+  "hash": "af5d1b407c",
+  "verdict": "ok",
+  "note": ""
+ },
+ {
+  "id": "P6",
+  "hash": "94b899b01b",
+  "verdict": "distorted",
+  "note": "支柱陈述说照五步做「就能让迟到的结果变成学习」,这个效力断言不在名下四条命题里(它们只讲步骤与禁忌),且比原书强:作者说沅水试行只是「示范而不是证明」(c10-p023),结语明言这套做法管不管用「还得看」、它自己的远声还在路上(c13-p004);另外适用范围的三个条件(远声两周以上、会再做、代价值得,c12-p002)被压成「少数重要决策」。"
+ },
+ {
+  "id": "c03-k1",
+  "hash": "736b5102bf",
+  "verdict": "ok",
+  "note": ""
+ },
+ {
+  "id": "c04-k1",
+  "hash": "8a67e2e693",
+  "verdict": "ok",
+  "note": ""
+ },
+ {
+  "id": "c08-k1",
+  "hash": "ae7b98069f",
+  "verdict": "ok",
+  "note": ""
+ },
+ {
+  "id": "c08-k2",
+  "hash": "a70533192f",
+  "verdict": "ok",
+  "note": ""
+ },
+ {
+  "id": "c08-k3",
+  "hash": "67bac8d69d",
+  "verdict": "ok",
+  "note": ""
+ },
+ {
+  "id": "c08-k4",
+  "hash": "0ec54fe074",
+  "verdict": "ok",
+  "note": ""
+ },
+ {
+  "id": "c05-k1",
+  "hash": "20310efb9a",
+  "verdict": "ok",
+  "note": ""
+ },
+ {
+  "id": "c05-k2",
+  "hash": "adff8079d4",
+  "verdict": "ok",
+  "note": ""
+ },
+ {
+  "id": "c03-k2",
+  "hash": "4271021c94",
+  "verdict": "ok",
+  "note": ""
+ },
+ {
+  "id": "c06-k2",
+  "hash": "630810fd86",
+  "verdict": "ok",
+  "note": ""
+ },
+ {
+  "id": "c06-k3",
+  "hash": "dd37ab9c06",
+  "verdict": "ok",
+  "note": ""
+ },
+ {
+  "id": "c07-k1",
+  "hash": "572072fd0d",
+  "verdict": "ok",
+  "note": ""
+ },
+ {
+  "id": "c07-k2",
+  "hash": "016aac16bc",
+  "verdict": "ok",
+  "note": ""
+ },
+ {
+  "id": "c07-k4",
+  "hash": "a015484a68",
+  "verdict": "ok",
+  "note": ""
+ },
+ {
+  "id": "c09-k1",
+  "hash": "2c12e723ea",
+  "verdict": "ok",
+  "note": ""
+ },
+ {
+  "id": "c09-k2",
+  "hash": "0c4a102b32",
+  "verdict": "ok",
+  "note": ""
+ },
+ {
+  "id": "c09-k3",
+  "hash": "41d2c9c28b",
+  "verdict": "ok",
+  "note": ""
+ },
+ {
+  "id": "c09-k4",
+  "hash": "a49cdf0031",
+  "verdict": "ok",
+  "note": ""
+ },
+ {
+  "id": "c10-k1",
+  "hash": "f74d9cbda1",
+  "verdict": "ok",
+  "note": ""
+ },
+ {
+  "id": "c10-k2",
+  "hash": "28b03d0e64",
+  "verdict": "ok",
+  "note": ""
+ },
+ {
+  "id": "c10-k3",
+  "hash": "9f535b0aa5",
+  "verdict": "ok",
+  "note": ""
+ },
+ {
+  "id": "c10-k4",
+  "hash": "3f9e499683",
+  "verdict": "ok",
+  "note": ""
+ },
+ {
+  "id": "c12-k1",
+  "hash": "0bb587a2c7",
+  "verdict": "ok",
+  "note": ""
+ },
+ {
+  "id": "c12-k2",
+  "hash": "0f2eccb53c",
+  "verdict": "distorted",
+  "note": "「且必须当下写,不超过十五分钟」把两件事并在一起:原文两条硬性要求是写完即锁和当下写(隔夜即掺入新消息,c12-p005);十五分钟是「我们的经验」里写一张封笺所花时间的上限(超过就成了论证报告,c12-p008),不是硬性要求,也不是指决策后十五分钟内必须写。"
+ },
+ {
+  "id": "c12-k6",
+  "hash": "c4b6551e2a",
+  "verdict": "ok",
+  "note": ""
+ },
+ {
+  "id": "c12-k7",
+  "hash": "924e77072f",
+  "verdict": "ok",
+  "note": ""
+ },
+ {
+  "id": "c02-k3",
+  "hash": "226677df26",
+  "verdict": "ok",
+  "note": ""
+ },
+ {
+  "id": "c05-k9",
+  "hash": "f9367b43a0",
+  "verdict": "ok",
+  "note": "ok。提示:后半句「第二章的损耗说法」是作者自己早先的看法(后来在第六章推翻),不是外部对手的观点;笔记已写明出处,不算错。"
+ },
+ {
+  "id": "c06-k1",
+  "hash": "1392d09a06",
+  "verdict": "ok",
+  "note": ""
+ },
+ {
+  "id": "c06-k6",
+  "hash": "595637d8eb",
+  "verdict": "ok",
+  "note": "立场基本对(对手论据)。疑点提示:作者只反对把这些论据搬到慢事情上,在动作技能和两周内见分晓的事情上他明说温特是对的(c06-p013、p025)。"
+ },
+ {
+  "id": "c06-k7",
+  "hash": "dfba3f66c8",
+  "verdict": "ok",
+  "note": "立场基本对。疑点提示:作者反对的是七日法则用于慢事情;禾灶这个例子本身作者认为成立(出餐时间属于远声本来就快的事,c06-p013、p025)。"
+ },
+ {
+  "id": "c09-k12",
+  "hash": "5bab8e36ef",
+  "verdict": "ok",
+  "note": ""
+ },
+ {
+  "id": "c10-k11",
+  "hash": "e07e69a6c1",
+  "verdict": "ok",
+  "note": ""
+ },
+ {
+  "id": "c10-k13",
+  "hash": "6d3437fc68",
+  "verdict": "ok",
+  "note": ""
+ },
+ {
+  "id": "c13-k4",
+  "hash": "83f7fab1f5",
+  "verdict": "ok",
+  "note": ""
+ }
+]
